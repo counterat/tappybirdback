@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tappy Bird</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="boostModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h1>BOOST</h1>
+            <p>BLAH BLAH BLAH</p>
+            <div class="boost-option">
+                <img src="./img/tap.png" alt="Multitap">
+                <div>
+                    <h2>MULTITAP</h2>
+                    <p>get +1 coin per tap<br>5 000 $BRD</p>
+                </div>
+            </div>
+            <div class="boost-option">
+                <img src="./img/energy 2.png">
+                <div>
+                    <h2>MAX ENERGY</h2>
+                    <p>get +500 max energy<br>5 000 $BRD</p>
+                </div>
+            </div>
+            <div class="boost-option">
+                <img src="./img/tap.png">
+                <div>
+                    <h2>AUTOCLICKER</h2>
+                    <p>get autoclicker for 12 hr<br>100 000 $BRD</p>
+                </div>
+            </div>
+            <button onclick="closeModal()">Go Back</button>
+        </div>
+    </div>
+
+
+
+
+    <div class="container">
+        <div class="top-bar">
+            <div class="coins">
+                <img src="./img/монетка 1.png" alt="Coins">
+                <span id="brdBalance">100 000</span>
+                <span>1260.05 $tappy</span>
+            </div>
+            <div class="backpack">
+                <img src="./img/backpack 6.png" alt="Backpack">
+            </div>
+        </div>
+        <div class="egg-container">
+            <h1>EGG LVL 1</h1>
+            <div class="progress-bar">
+                <div class="progress" style="width: 75%;"></div>
+            </div>
+            <img src="./img/яйцо.svg" alt="Egg" class="egg">
+        </div>
+        <div class="bottom-bar">
+            <div class="energy">
+                <img src="./img/energy 3.png" alt="Energy">
+                <span id="energy">100/5000</span>
+            </div>
+            <div class="menu">
+                <div class="menu-item"><img src="./img/leaderboard.png" alt="Leaderboard"></div>
+                <div class="menu-item"><img src="./img/boost.png" alt="Boost" onclick="openModal()"></div>
+                <div class="menu-item"><img src="./img/earn-more.png" alt="Earn More"></div>
+                <div class="menu-item"><img src="./img/store.png" alt="Shop"></div>
+            </div>
+            
+        </div>
+    </div>
+
+<script>function openModal() {
+    document.getElementById("boostModal").style.display = "block";
+}
+
+function closeModal() {
+    document.getElementById("boostModal").style.display = "none";
+}
+
+// Close the modal when clicking outside of it
+window.onclick = function(event) {
+    const modal = document.getElementById("boostModal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+
+
+    <script>
+
+
+const socketUrl = 'ws://127.0.0.1:8000/ws';
+const socket = new WebSocket(socketUrl);
+socket.onopen = function(event) {
+        console.log('WebSocket is open now.');
+    };
+socket.onmessage = function(event) {
+
+    let data = JSON.parse(event.data)
+    console.log([userId, data.id], data.eventname)
+
+    if (data.eventname == 'energy_replenishment' && userId == data.id){
+
+        updateCoins(data.coins)
+        updateEnergy(data.energy)
+    }
+};
+
+        var userId;
+var myenergy;
+function updateEnergy(energy){
+    myenergy = energy
+    document.querySelector('#energy').textContent = `${myenergy}/5000`
+}
+
+
+function sendRequest(userId) {
+    console.log(userId)
+    // Создание данных для отправки
+    const data = {
+        userId: userId // Замените 'yourUserId' на фактический идентификатор пользователя
+    };
+
+    // Отправка запроса с использованием Fetch API
+    fetch('http://127.0.0.1:8000/minecoin', {
+        method: 'POST', // Указание метода
+        headers: {
+            'Content-Type': 'application/json' // Установка заголовка для отправки JSON данных
+        },
+        body: JSON.stringify(data) // Преобразование данных в JSON строку
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Обработка ошибки, если ответ не успешный
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json(); // Преобразование ответа в JSON, если успешный
+    })
+    .then(data => {
+        // Обработка успешного ответа
+        updateCoins(data.coins)
+        updateEnergy(data.energy)
+        console.log('Success:', data);
+    })
+    .catch(error => {
+        // Обработка ошибки
+        console.error('There has been a problem with your fetch operation:', error);
+    });
+}
+
+
+
+document.querySelector('.egg').addEventListener('click', () =>{sendRequest(userId) });
+var coins = 0
+function updateCoins(coins){
+    coins = coins;
+    document.querySelector('#brdBalance').textContent = coins
+    
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('http://localhost:8000/authorize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        // ваши данные для отправки
+                        key1: 'value1',
+                        key2: 'value2'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                   
+                    userId = data.id
+                    updateCoins(data.coins)
+                    console.log('Success:', data);
+                } else {
+                    console.error('Error:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        });
+
+
+    </script>
+</body>
+</html>

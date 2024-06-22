@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .dropzone {
+            border: 2px dashed #00d1b2;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            color: #00d1b2;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Admin Panel</h1>
+
+            <div class="field">
+                <label class="label">Task Type</label>
+                <div class="control">
+                    <label class="radio">
+                        <input type="radio" name="task_type" value="simple" onclick="toggleTaskType()" checked>
+                        Simple Task
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="task_type" value="complex" onclick="toggleTaskType()">
+                        Complex Task
+                    </label>
+                </div>
+            </div>
+
+            <!-- Simple Task Form -->
+            <div id="simple-task-form">
+                <form id="task-form" method="post" enctype="multipart/form-data" onsubmit="submitForm(event)">
+                    <div class="field">
+                        <label class="label">Task Title</label>
+                        <div class="control">
+                            <input class="input" type="text" name="title" placeholder="Task Title" required>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <label class="label">Description</label>
+                        <div class="control">
+                            <textarea class="textarea" name="description" placeholder="Task Description" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Action</label>
+                        <div class="control">
+                            <div class="select">
+                                <select name="action" required>
+                                    <option value="comment">Comment</option>
+                                    <option value="subscribe">Subscribe</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <label class="label">Social Network</label>
+                        <div class="control">
+                            <div class="select">
+                                <select name="socnet" required>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="telegram">Telegram</option>
+                                    <option value="discord">Discord</option>
+                                    <option value="twitter">Twitter</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Link</label>
+                        <div class="control">
+                            <input class="input" type="url" name="href" placeholder="Link" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Reward in BRD</label>
+                        <div class="control">
+                            <input class="input" type="number" name="reward" placeholder="Reward in BRD" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Reward in Tappy</label>
+                        <div class="control">
+                            <input class="input" type="number" name="reward_in_tappy" placeholder="Reward in Tappy" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Geolocation</label>
+                        <div class="control">
+                            <div class="select">
+                                <select name="geo" required>
+                                    <option value="EUROPE">EUROPE</option>
+                                    <option value="ORIENTAL">ORIENTAL</option>
+                                    <option value="RUSSIA">RUSSIA</option>
+                                    <option value="CIS">CIS</option>
+                                    <option value="ASIA">ASIA</option>
+                                    <option value="MIDDLE ASIA">MIDDLE ASIA</option>
+                                    <option value="AUSTRALIA">AUSTRALIA</option>
+                                    <option value="LATIN AMERICA">LATIN AMERICA</option>
+                                    <option value="AMERICA">AMERICA</option>
+                                    <option value="AFRICA">AFRICA</option>
+                                    <option value="GLOBAL">GLOBAL</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Banner Fields -->
+                    <div class="field">
+                        <label class="label">Banner Title</label>
+                        <div class="control">
+                            <input class="input" type="text" name="banner_title" placeholder="Banner Title" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Banner Description</label>
+                        <div class="control">
+                            <textarea class="textarea" name="banner_description" placeholder="Banner Description" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Banner Image</label>
+                        <div class="dropzone" id="banner-dropzone">Drag & drop an image here or click to upload</div>
+                        <input type="file" id="banner-image" name="banner_image" style="display: none;" accept="image/*" required>
+                    </div>
+
+                    <div class="control">
+                        <button class="button is-primary" type="submit">Create Task</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Complex Task Form -->
+            <div id="complex-task-form" style="display: none;">
+                <div class="field">
+                    <label class="label">Big Task Title</label>
+                    <div class="control">
+                        <input class="input" type="text" id="big-task-title" placeholder="Big Task Title" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Description</label>
+                    <div class="control">
+                        <textarea class="textarea" id="big-task-description" placeholder="Big Task Description" required></textarea>
+                    </div>
+                </div>
+                <!-- Добавьте после поля "Reward in Tappy" -->
+                <div class="field">
+                    <label class="label">Action</label>
+                    <div class="control">
+                        <div class="select">
+                            <select id="complex-action" required>
+                                <option value="comment">Comment</option>
+                                <option value="subscribe">Subscribe</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Social Network</label>
+                    <div class="control">
+                        <div class="select">
+                            <select id="complex-socnet" required>
+                                <option value="youtube">YouTube</option>
+                                <option value="telegram">Telegram</option>
+                                <option value="discord">Discord</option>
+                                <option value="twitter">Twitter</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Добавьте после поля "Number of Subtasks" -->
+                <div class="field">
+                    <label class="label">Reward in BRD</label>
+                    <div class="control">
+                        <input class="input" type="number" id="complex-reward" placeholder="Reward in BRD" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Reward in Tappy</label>
+                    <div class="control">
+                        <input class="input" type="number" id="complex-reward-in-tappy" placeholder="Reward in Tappy" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Geolocation</label>
+                    <div class="control">
+                        <div class="select">
+                            <select id="big-task-geo" required>
+                                <option value="EUROPE">EUROPE</option>
+                                <option value="ORIENTAL">ORIENTAL</option>
+                                <option value="RUSSIA">RUSSIA</option>
+                                <option value="CIS">CIS</option>
+                                <option value="ASIA">ASIA</option>
+                                <option value="MIDDLE ASIA">MIDDLE ASIA</option>
+                                <option value="AUSTRALIA">AUSTRALIA</option>
+                                <option value="LATIN AMERICA">LATIN AMERICA</option>
+                                <option value="AMERICA">AMERICA</option>
+                                <option value="AFRICA">AFRICA</option>
+                                <option value="GLOBAL">GLOBAL</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Banner Fields for Complex Task -->
+                <div class="field">
+                    <label class="label">Banner Title</label>
+                    <div class="control">
+                        <input class="input" type="text" id="complex-banner-title" placeholder="Banner Title" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Banner Description</label>
+                    <div class="control">
+                        <textarea class="textarea" id="complex-banner-description" placeholder="Banner Description" required></textarea>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Banner Image</label>
+                    <div class="dropzone" id="complex-banner-dropzone">Drag & drop an image here or click to upload</div>
+                    <input type="file" id="complex-banner-image" style="display: none;" accept="image/*" required>
+                </div>
+
+                <div class="field">
+                    <label class="label">Number of Subtasks</label>
+                    <div class="control">
+                        <input class="input" type="number" id="number-of-subtasks" min="1" placeholder="Enter number of subtasks" oninput="generateSubtaskForms()">
+                    </div>
+                </div>
+                <div id="subtasks-container"></div>
+                <div class="control">
+                    <button class="button is-primary" onclick="submitComplexForm()">Create Tasks</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <script>
+        var bannerImage;
+        var complexBannerImage;
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            toggleTaskType();
+            document.querySelectorAll('input[name="task_type"]').forEach((elem) => {
+                elem.addEventListener('change', toggleTaskType);
+            });
+
+            // Simple Task Banner Image
+            const dropzone = document.getElementById('banner-dropzone');
+            const fileInput = document.getElementById('banner-image');
+
+            dropzone.addEventListener('click', () => fileInput.click());
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('is-dragover');
+            });
+            dropzone.addEventListener('dragleave', () => dropzone.classList.remove('is-dragover'));
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('is-dragover');
+                const files = e.dataTransfer.files;
+                fileInput.files = files;
+                dropzone.textContent = files[0].name;
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const base64String = event.target.result.split(',')[1];
+                    bannerImage = base64String;
+                    console.log(base64String); // Проверка строки Base64
+                };
+                reader.readAsDataURL(files[0]);
+            });
+
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    dropzone.textContent = fileInput.files[0].name;
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const base64String = event.target.result.split(',')[1];
+                        bannerImage = base64String;
+                        console.log(base64String); // Проверка строки Base64
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else {
+                    dropzone.textContent = 'Drag & drop an image here or click to upload';
+                }
+            });
+
+            // Complex Task Banner Image
+            const complexDropzone = document.getElementById('complex-banner-dropzone');
+            const complexFileInput = document.getElementById('complex-banner-image');
+
+            complexDropzone.addEventListener('click', () => complexFileInput.click());
+            complexDropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                complexDropzone.classList.add('is-dragover');
+            });
+            complexDropzone.addEventListener('dragleave', () => complexDropzone.classList.remove('is-dragover'));
+            complexDropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                complexDropzone.classList.remove('is-dragover');
+                const files = e.dataTransfer.files;
+                complexFileInput.files = files;
+                complexDropzone.textContent = files[0].name;
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const base64String = event.target.result.split(',')[1];
+                    complexBannerImage = base64String;
+                    console.log(base64String); // Проверка строки Base64
+                };
+                reader.readAsDataURL(files[0]);
+            });
+
+            complexFileInput.addEventListener('change', () => {
+                if (complexFileInput.files.length > 0) {
+                    complexDropzone.textContent = complexFileInput.files[0].name;
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const base64String = event.target.result.split(',')[1];
+                        complexBannerImage = base64String;
+                        console.log(base64String); // Проверка строки Base64
+                    };
+                    reader.readAsDataURL(complexFileInput.files[0]);
+                } else {
+                    complexDropzone.textContent = 'Drag & drop an image here or click to upload';
+                }
+            });
+        });
+
+        function toggleTaskType() {
+            const simpleTaskForm = document.getElementById('simple-task-form');
+            const complexTaskForm = document.getElementById('complex-task-form');
+            const taskType = document.querySelector('input[name="task_type"]:checked');
+            
+            if (taskType && taskType.value === 'simple') {
+                simpleTaskForm.style.display = 'block';
+                complexTaskForm.style.display = 'none';
+            } else if (taskType && taskType.value === 'complex') {
+                simpleTaskForm.style.display = 'none';
+                complexTaskForm.style.display = 'block';
+            }
+        }
+
+        function generateSubtaskForms() {
+            const container = document.getElementById('subtasks-container');
+            container.innerHTML = '';
+            const numberOfSubtasks = parseInt(document.getElementById('number-of-subtasks').value);
+            const bigTaskGeo = document.getElementById('big-task-geo').value;
+
+            for (let i = 0; i < numberOfSubtasks; i++) {
+                const formHtml = `
+                    <div class="box">
+                        <h2 class="title is-4">Subtask ${i + 1}</h2>
+                        <div class="field">
+                            <label class="label">Subtask Title</label>
+                            <div class="control">
+                                <input class="input" type="text" name="subtask_title_${i}" placeholder="Subtask Title" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Description</label>
+                            <div class="control">
+                                <textarea class="textarea" name="subtask_description_${i}" placeholder="Subtask Description" required></textarea>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Action</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select name="subtask_action_${i}" required>
+                                        <option value="comment">Comment</option>
+                                        <option value="subscribe">Subscribe</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Social Network</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select name="subtask_socnet_${i}" required>
+                                        <option value="youtube">YouTube</option>
+                                        <option value="telegram">Telegram</option>
+                                        <option value="discord">Discord</option>
+                                        <option value="twitter">Twitter</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Link</label>
+                            <div class="control">
+                                <input class="input" type="url" name="subtask_href_${i}" placeholder="Link" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Reward in BRD</label>
+                            <div class="control">
+                                <input class="input" type="number" name="subtask_reward_${i}" placeholder="Reward in BRD" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Reward in Tappy</label>
+                            <div class="control">
+                                <input class="input" type="number" name="subtask_reward_in_tappy_${i}" placeholder="Reward in Tappy" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Geolocation</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select name="subtask_geo_${i}" required disabled>
+                                        <option value="${bigTaskGeo}">${bigTaskGeo}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', formHtml);
+            }
+        }
+
+        function submitForm(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('task-form');
+            const formData = new FormData(form);
+            const data = {};
+
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            data['reward_in_tappy'] = parseInt(data['reward_in_tappy']);
+            data['reward'] = parseInt(data['reward']);
+            data['sign'] = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiJ9.B1jT-B1TTgbcAyaOHnClenZzU0f18364UvOYpyKItW8';
+            data['type'] = 'simple';
+            data['banner_image'] = bannerImage;
+            
+            console.log(data);
+
+            fetch('/create_task', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'sign': 'valid_token'  // Пример заголовка sign
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_ok) {
+                    alert('Task created successfully!');
+                } else {
+                    alert('Failed to create task.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error creating task.');
+            });
+        }
+
+        function submitComplexForm() {
+            const bigTaskTitle = document.getElementById('big-task-title').value;
+            const bigTaskDescription = document.getElementById('big-task-description').value;
+            const bigTaskGeo = document.getElementById('big-task-geo').value;
+            const numberOfSubtasks = parseInt(document.getElementById('number-of-subtasks').value);
+            const complexReward = parseInt(document.getElementById('complex-reward').value);
+            const complexRewardInTappy = parseInt(document.getElementById('complex-reward-in-tappy').value);
+            const complexAction = document.getElementById('complex-action').value;
+            const complexSocnet = document.getElementById('complex-socnet').value;
+            const subtasks = [];
+
+            for (let i = 0; i < numberOfSubtasks; i++) {
+                const subtaskData = {};
+                subtaskData['title'] = document.querySelector(`[name="subtask_title_${i}"]`).value;
+                subtaskData['description'] = document.querySelector(`[name="subtask_description_${i}"]`).value;
+        
+                subtaskData['action'] = document.querySelector(`[name="subtask_action_${i}"]`).value;
+                subtaskData['socnet'] = document.querySelector(`[name="subtask_socnet_${i}"]`).value;
+                subtaskData['href'] = document.querySelector(`[name="subtask_href_${i}"]`).value;
+                subtaskData['reward'] = parseInt(document.querySelector(`[name="subtask_reward_${i}"]`).value);
+                subtaskData['reward_in_tappy'] = parseInt(document.querySelector(`[name="subtask_reward_in_tappy_${i}"]`).value);
+                subtaskData['geo'] = bigTaskGeo;
+                subtaskData['type'] = 'simple';
+                subtasks.push(subtaskData);
+            }
+
+            const data = {
+                title: bigTaskTitle,
+                description: bigTaskDescription,
+                geo: bigTaskGeo,
+                subtasks: subtasks,
+                sign: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiJ9.B1jT-B1TTgbcAyaOHnClenZzU0f18364UvOYpyKItW8',
+                type: 'complex',
+                reward: complexReward,
+                reward_in_tappy: complexRewardInTappy,
+                action: complexAction,
+                socnet: complexSocnet,
+                href: "http://127.0.0.1:8000/admin",
+                banner_title: document.getElementById('complex-banner-title').value,
+                banner_description: document.getElementById('complex-banner-description').value,
+                banner_image: complexBannerImage
+            };
+
+            console.log(data);
+
+            fetch('/create_task', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'sign': 'valid_token'  // Пример заголовка sign
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_ok) {
+                    alert('Tasks created successfully!');
+                } else {
+                    alert('Failed to create tasks.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error creating tasks.');
+            });
+        }
+    </script>
+</body>
+</html>

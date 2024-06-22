@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </section>
+    <script>
+        function toggleTaskType() {
+            const simpleTaskForm = document.getElementById('simple-task-form');
+            const complexTaskForm = document.getElementById('complex-task-form');
+            const taskType = document.querySelector('input[name="task_type"]:checked');
+            
+            if (taskType && taskType.value === 'simple') {
+                simpleTaskForm.style.display = 'block';
+                complexTaskForm.style.display = 'none';
+            } else if (taskType && taskType.value === 'complex') {
+                simpleTaskForm.style.display = 'none';
+                complexTaskForm.style.display = 'block';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            toggleTaskType();
+            document.querySelectorAll('input[name="task_type"]').forEach((elem) => {
+                elem.addEventListener('change', toggleTaskType);
+            });
+        });
+    </script>
+</body>
+</html>
