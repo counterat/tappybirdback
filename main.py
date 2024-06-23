@@ -572,8 +572,9 @@ async def authorize_user(request: Request):
             else:
                 return HTTPException(403)
             user = await find_user_by_telegram_id(user_id)
+            connected_users = get_global_variable()
             if user:
-                connected_users = get_global_variable()
+                
                 if not connected_users:
                     connected_users = set()
                 else:
