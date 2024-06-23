@@ -581,6 +581,7 @@ async def authorize_user(request: Request):
                     connected_users.add(user_id)
                 set_global_variable(connected_users)
                 res = await find_user_in_cache(user.id)
+                res = json.loads(res)
                 response ={
 **user.to_dict(),
 **res
@@ -603,9 +604,7 @@ async def authorize_user(request: Request):
                     connected_users = set()
                 else:
                     connected_users.add(userr.id)
-                print(res, '\n'*3)
-                print(userr)
-                print(res)
+                res = json.loads(res)
                 response ={
 **userr.to_dict(),
 **res
