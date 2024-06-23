@@ -70,10 +70,10 @@ async def update_all_users_energy():
 scheduler = AsyncIOScheduler()
 
 scheduler.add_job(update_all_users_energy, 'interval', seconds=2)
-#scheduler.add_job(click_for_autoclicker_users, 'interval', seconds=60)
-#scheduler.add_job(update_users_leaderboard, 'interval', seconds=1)
-#scheduler.add_job(update_squads_leaderboard, 'interval', seconds=1) 
-#scheduler.add_job(update_all_users_income_per_day, CronTrigger(hour=0, minute=0))
+scheduler.add_job(click_for_autoclicker_users, 'interval', seconds=60)
+scheduler.add_job(update_users_leaderboard, 'interval', seconds=1)
+scheduler.add_job(update_squads_leaderboard, 'interval', seconds=1) 
+scheduler.add_job(update_all_users_income_per_day, CronTrigger(hour=0, minute=0))
 
 scheduler.start()
 active_websockets: List[WebSocket] = []
@@ -539,8 +539,16 @@ async def buy_booster_handler(request:Request):
             return result
     return HTTPException(403)
 
-isTest = True
-
+isTest = False
+@app.get('/tonconnect-manifest.json')
+async def return_tonconnect_manifest(request:Request):
+    return  {
+    "url": "https://tappyback.ton-runes.top",                        
+    "name": "tappybird",                     
+      "iconUrl": "https://ton-connect.github.io/demo-dapp-with-react-ui/apple-touch-icon.png",
+  "termsOfUseUrl": "https://ton-connect.github.io/demo-dapp-with-react-ui/terms-of-use.txt",
+  "privacyPolicyUrl": "https://ton-connect.github.io/demo-dapp-with-react-ui/privacy-policy.txt"
+  }
 
 @app.post('/authorize')
 async def authorize_user(request: Request):

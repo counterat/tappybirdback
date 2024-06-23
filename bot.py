@@ -48,8 +48,14 @@ async def handler(message:types.Message):
 
 @dp.message_handler()
 async def handler(message:types.Message):
-    result = await is_user_in_channel(881704893 ,-1002216118815)
-    await message.answer(f'{result}')
+    from aiogram.types import  InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+    referal_code = message.get_args()
+    
+    if  not referal_code:
+        referal_code = ''
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(  InlineKeyboardButton(text='Играть', web_app= WebAppInfo(url='https://tappyback.ton-runes.top/'+str(referal_code))))
+    await message.answer('Играть в игру', reply_markup=keyboard)
 
 
 
