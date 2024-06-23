@@ -60,8 +60,4 @@ async def handler(message:types.Message):
 
 
 if __name__ == '__main__':
-    import asyncio
-    loop = asyncio.get_event_loop()
-    # Запустите асинхронную функцию в событийном цикле
-
-   
+    executor.start_polling(dp, skip_updates=True)
