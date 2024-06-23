@@ -562,8 +562,10 @@ async def authorize_user(request: Request):
         if not isTest:
             data = await request.json()
             initdata = data['initdata']
+            print(initdata)
             invit_code = data.get('invitCode')
             result,vals = validate_initdata(initdata, bot_token)
+            print(result,vals)
             vals = vals['user']
             if result:
                 user_id = vals['id']
