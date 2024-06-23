@@ -604,6 +604,8 @@ async def authorize_user(request: Request):
                 else:
                     connected_users.add(userr.id)
                 print(res, '\n'*3)
+                print(userr)
+                print(res)
                 response ={
 **userr.to_dict(),
 **res
