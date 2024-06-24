@@ -217,6 +217,8 @@ async def mine_brd(user_id, is_autoclicker=False):
     boosters_dict = value_dict.get('boosters')
     hammers_dict = value_dict.get('hammers')
     current_level_of_egg = value_dict['current_level_of_egg']
+    if current_level_of_egg == 7:
+                return 'buy egg'
     hammer = None
     if boosters_dict.get('multitap') !={}:
         brds_for_tap += 1*boosters_dict['multitap']['buff_level']
@@ -257,6 +259,8 @@ async def mine_brd(user_id, is_autoclicker=False):
                 brds_for_tap = 3
         result = await update_user_energy_and_coin_balance_transaction(user_id, -60*brds_for_tap,  60*brds_for_tap, )
         current_level_of_egg = result['current_level_of_egg']
+        if current_level_of_egg == 7:
+                return 'buy egg'
         hp_for_egg = eggs[current_level_of_egg]['hp']
         if result['exp'] >= hp_for_egg:
             if current_level_of_egg == 7:
