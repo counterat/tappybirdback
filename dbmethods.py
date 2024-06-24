@@ -229,7 +229,7 @@ async def join_squad(user_id, squad_id):
         users_in_squad.append(user_id)
         update_squad_query = update(Squad).where(Squad.id == squad_id).values(users=users_in_squad)
         async with session.begin():
-            if update_old_squad_query:
+            if update_old_squad_query is not None:
                 await session.execute(update_old_squad_query)
             await session.execute(update_query)
             
