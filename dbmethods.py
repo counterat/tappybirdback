@@ -265,7 +265,7 @@ async def create_squad(user_id, telegram_link):
             await session.execute(update_old_squad_query)
             update_query = update(User).where(User.id == user_id).values(in_squad = new_squad.id)
             await session.execute(update_query)
-            await session.commit()
+          
             result = await new_squad_in_cache(new_squad.id, new_squad.to_dict())
             print(f'{result}'*20)
             return result

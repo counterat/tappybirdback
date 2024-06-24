@@ -433,7 +433,7 @@ async def check_is_user_subscribed_on_socnet(request: Request):
 
 @app.post('/create_squad')
 async def create_squad_handler(request:Request):
-    try:
+
         data = await request.json()
         user_id = data['userId']
         sign = data['sign']
@@ -445,8 +445,6 @@ async def create_squad_handler(request:Request):
                     result = await create_squad(user_id, link)
                     if result:
                         return result
-    except Exception as ex:
-        print(ex)
         return HTTPException(403)
 
 @app.post('/join_squad')
