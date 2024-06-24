@@ -240,6 +240,7 @@ async def mine_brd(user_id, is_autoclicker=False):
         return 'buy egg'
     if current_level_of_egg == 7:
                 await set_eggs_and_exp_to_max(user_id)
+                await setIsBlockedTrue(user_id)
                 return 'buy egg'
     hammer = None
     if boosters_dict.get('multitap') !={}:
@@ -285,21 +286,23 @@ async def mine_brd(user_id, is_autoclicker=False):
             await setIsBlockedTrue(user_id)
         hp_for_egg = eggs[current_level_of_egg]['hp']
         if result['exp'] >= hp_for_egg:
-            if current_level_of_egg == 7:
-                await setIsBlockedTrue(user_id)
+            
             bird_id = await choose_bird_for_user(user_id, current_level_of_egg)
             if bird_id == 'all':
                 return 'buy egg'
             bird = BIRDLIST[bird_id-1]
 
             result['current_level_of_egg'] += 1
-            if current_level_of_egg == 7:
+            if result['current_level_of_egg'] == 7:
                 result['current_level_of_egg'] = 6
+                await setIsBlockedTrue(user_id)
             else:
                 await add_user_level_of_egg(user_id)
             exp_result  = await update_exp(user_id, 0)
             result['exp'] = exp_result['exp']
             result['new_bird']  = bird
+          
+                
             await append_bird_to_user(user_id, bird['id'])
     else:
         if not is_hammer:
@@ -319,21 +322,23 @@ async def mine_brd(user_id, is_autoclicker=False):
         result['brds_for_tap'] = brds_for_tap
         print(current_level_of_egg, hp_for_egg, result['exp'], "loh")
         if result['exp'] >= hp_for_egg:
-            if current_level_of_egg == 7:
-                await setIsBlockedTrue(user_id)
+            
             bird_id = await choose_bird_for_user(user_id, current_level_of_egg)
             if bird_id == 'all':
                 return 'buy egg'
             bird = BIRDLIST[bird_id-1]
 
             result['current_level_of_egg'] += 1
-            if current_level_of_egg == 7:
+            if result['current_level_of_egg'] == 7:
                 result['current_level_of_egg'] = 6
+                await setIsBlockedTrue(user_id)
             else:
                 await add_user_level_of_egg(user_id)
             exp_result  = await update_exp(user_id, 0)
             result['exp'] = exp_result['exp']
             result['new_bird']  = bird
+            if result['current_level_of_egg'] == 7:
+                await setIsBlockedTrue(user_id)
             await append_bird_to_user(user_id, bird['id'])
     return result
 import decimal
