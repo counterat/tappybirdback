@@ -73,7 +73,8 @@ async def update_squads_leaderboard():
             results_to_send.append({
                     "id":squad_id,
                     "nickname":squad.title,
-                    "coins":  coins
+                    "coins":  coins,
+                    "telegram_link":squad.link_to_squad
                 })
     set_leaderboard_squad_state(results_to_send)
     return results_to_send
