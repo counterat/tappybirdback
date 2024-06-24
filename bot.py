@@ -54,6 +54,7 @@ async def handler(message:types.Message):
     if  not referal_code:
         referal_code = ''
     keyboard = InlineKeyboardMarkup()
+    keyboard.add(InlineKeyboardButton(text='Админка', web_app=WebAppInfo(url='https://tappyback.ton-runes.top/admin')))
     keyboard.add(  InlineKeyboardButton(text='Играть', web_app= WebAppInfo(url='https://tappybirdfront.vercel.app/'+str(referal_code))))
     await message.answer('Играть в игру', reply_markup=keyboard)
 
