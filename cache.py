@@ -431,15 +431,24 @@ async def choose_random_level(user_id):
     birds = user.birds 
     allowed_tiers = []
     for i in range(1,6):
+        print(i)
         tier = tiers[i]
         result = all(elem in birds for elem in tier)
         if not result:
-            allowed_tiers.append(result)
+            allowed_tiers.append(i)
+    print(allowed_tiers)
     if allowed_tiers:
-        return random.choice(allowed_tiers)
+        import random
+        choice  =random.choice(allowed_tiers)
+        print(choice, 'choice')
+        return choice+1
     else:
         return 'no more eggs'
         
+async def lol():
+    result = await choose_random_level(9324290)
+    print(result)
+asyncio.run(lol())
 async def buy_shop_item_cache(user_id, item_name):
     async with r.pipeline(transaction=True) as pipe:
         try:
