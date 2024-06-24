@@ -50,8 +50,8 @@ default_config_for_user={
     'max_energy':5000,
     "when_money_was_paid_for_user_last_time":0,
     "income_per_this_day":0,
-    "income_for_ref":5000
-
+    "income_for_ref":5000,
+    "isBlocked":False
 }
 
 """

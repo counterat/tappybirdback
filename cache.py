@@ -130,6 +130,25 @@ async def get_user_and_his_income_for_ref(user_id):
     }
     return data
 
+async def set_eggs_and_exp_to_max(key):
+    async with r.pipeline(transaction=True) as pipe:
+        try:
+            
+            await pipe.watch(f'users:{key}')
+            user_data = await pipe.hget('users', key)
+            user_data = json.loads(user_data)
+            user_data['current_level_of_egg'] = 6
+            user_data['exp'] = eggs[6]['hp']-1
+            await pipe.hset(f'users',f'{key}', json.dumps({
+                **user_data,
+            }))
+            await pipe.execute()
+            return user_data
+        except Exception as e:
+            await pipe.reset()
+            print(f'{e}'*100)
+            raise e
+
 async def update_income_per_day(key):
     async with r.pipeline(transaction=True) as pipe:
         try:
@@ -217,7 +236,10 @@ async def mine_brd(user_id, is_autoclicker=False):
     boosters_dict = value_dict.get('boosters')
     hammers_dict = value_dict.get('hammers')
     current_level_of_egg = value_dict['current_level_of_egg']
+    if value_dict['isBlocked']:
+        return 'buy egg'
     if current_level_of_egg == 7:
+                await set_eggs_and_exp_to_max(user_id)
                 return 'buy egg'
     hammer = None
     if boosters_dict.get('multitap') !={}:
@@ -260,19 +282,21 @@ async def mine_brd(user_id, is_autoclicker=False):
         result = await update_user_energy_and_coin_balance_transaction(user_id, -60*brds_for_tap,  60*brds_for_tap, )
         current_level_of_egg = result['current_level_of_egg']
         if current_level_of_egg == 7:
-                return 'buy egg'
+            await setIsBlockedTrue(user_id)
         hp_for_egg = eggs[current_level_of_egg]['hp']
         if result['exp'] >= hp_for_egg:
             if current_level_of_egg == 7:
-                return 'buy egg'
+                await setIsBlockedTrue(user_id)
             bird_id = await choose_bird_for_user(user_id, current_level_of_egg)
             if bird_id == 'all':
                 return 'buy egg'
             bird = BIRDLIST[bird_id-1]
 
             result['current_level_of_egg'] += 1
-
-            await add_user_level_of_egg(user_id)
+            if current_level_of_egg == 7:
+                result['current_level_of_egg'] = 6
+            else:
+                await add_user_level_of_egg(user_id)
             exp_result  = await update_exp(user_id, 0)
             result['exp'] = exp_result['exp']
             result['new_bird']  = bird
@@ -289,21 +313,24 @@ async def mine_brd(user_id, is_autoclicker=False):
         print(f'{result}'*2)
         current_level_of_egg = result['current_level_of_egg']
         if current_level_of_egg == 7:
+                await set_eggs_and_exp_to_max(user_id)
                 return 'buy egg'
         hp_for_egg = eggs[current_level_of_egg]['hp']
         result['brds_for_tap'] = brds_for_tap
         print(current_level_of_egg, hp_for_egg, result['exp'], "loh")
         if result['exp'] >= hp_for_egg:
             if current_level_of_egg == 7:
-                return 'buy egg'
+                await setIsBlockedTrue(user_id)
             bird_id = await choose_bird_for_user(user_id, current_level_of_egg)
             if bird_id == 'all':
                 return 'buy egg'
             bird = BIRDLIST[bird_id-1]
 
             result['current_level_of_egg'] += 1
-
-            await add_user_level_of_egg(user_id)
+            if current_level_of_egg == 7:
+                result['current_level_of_egg'] = 6
+            else:
+                await add_user_level_of_egg(user_id)
             exp_result  = await update_exp(user_id, 0)
             result['exp'] = exp_result['exp']
             result['new_bird']  = bird
@@ -403,6 +430,32 @@ async def users_leaderboard_cache():
             print(sorted_users)
             return sorted_users
 
+async def setIsBlockedTrue(user_id):
+     async with r.pipeline(transaction=True) as pipe:
+        try:
+            # Начинаем транзакцию
+            await pipe.watch(f'users:{user_id}')
+            user_data = await pipe.hget('users', user_id)
+            user_data = json.loads(user_data)
+            user_data['isBlocked'] = True
+            if not user_data:
+                raise ValueError("User not found")
+            await pipe.hset(f'users',f'{user_id}', json.dumps({
+                **user_data,
+                
+                
+            }))
+
+    
+            results =await pipe.execute()
+      
+            return {**user_data}
+
+        except Exception as e:
+            await pipe.reset()
+            raise e
+
+
 async def append_completed_tasks_to_user(user_id, task_id):
     async with r.pipeline(transaction=True) as pipe:
         try:
@@ -466,6 +519,7 @@ async def buy_shop_item_cache(user_id, item_name):
                 random_level = await choose_random_level(user_id)
                 if random_level == 'no more eggs':
                     return random_level
+                user_data["isBlocked"] = False
                 user_data['current_level_of_egg'] = random_level
                 user_data['exp'] = 0
             pipe.multi()
