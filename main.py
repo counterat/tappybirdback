@@ -458,7 +458,7 @@ async def join_squad_handler(request:Request):
         if user:
             if jwt.decode(sign, "secret_key", algorithms="HS256")['password'] == user.password:
                 result = await join_squad(user_id, squad_id)
-       
+                
                 if result:
                     return {'is_ok':True}
     

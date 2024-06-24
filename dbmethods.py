@@ -234,6 +234,8 @@ async def join_squad(user_id, squad_id):
             await session.execute(update_query)
             
             await session.execute(update_squad_query)
+        squad = await find_squad_by_id(squad_id)
+        print(squad, 'durov'*20)
         result = await update_squad_users(squad_id, users_in_squad)
         return result
 
