@@ -445,10 +445,7 @@ async def choose_random_level(user_id):
     else:
         return 'no more eggs'
         
-async def lol():
-    result = await choose_random_level(9324290)
-    print(result)
-asyncio.run(lol())
+
 async def buy_shop_item_cache(user_id, item_name):
     async with r.pipeline(transaction=True) as pipe:
         try:
