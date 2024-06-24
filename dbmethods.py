@@ -255,8 +255,9 @@ async def create_squad(user_id, telegram_link):
             async with session.begin():
                 session.add(new_squad)
             new_squad = await find_squad_by_link(telegram_link)
+            print(new_squad.to_dict())
             user = await find_user_by_id(user_id)
-            print(user,'dre'*10)
+            print(user.to_dict(),'dre'*10)
             if user.in_squad:
                 from cache import update_squad_users
                         
@@ -265,15 +266,20 @@ async def create_squad(user_id, telegram_link):
                 old_squad_users.remove(user_id)
                 update_old_squad_query = update(Squad).where(Squad.id == old_squad.id).values(users=old_squad_users)
                 await update_squad_users(old_squad.id,old_squad_users)
-                await session.execute(update_old_squad_query)
+                async with session.begin():
+                
+                    await session.execute(update_old_squad_query)
             update_query = update(User).where(User.id == user_id).values(in_squad = new_squad.id)
-            await session.execute(update_query)
+            async with session.begin():
+                
+                await session.execute(update_query)
           
             result = await new_squad_in_cache(new_squad.id, new_squad.to_dict())
             print(f'{result}'*20)
             return result
         else:
             result = await join_squad(user_id, maybe_squad.id)
+            print(result)
             async with session.begin():
             
                 update_query = update(User).where(User.id == user_id).values(in_squad = result.id)
