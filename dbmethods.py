@@ -262,7 +262,7 @@ async def create_squad(user_id, telegram_link):
                 old_squad_users.remove(user_id)
                 update_old_squad_query = update(Squad).where(Squad.id == old_squad.id).values(users=old_squad_users)
                 await update_squad_users(old_squad.id,old_squad_users)
-            await session.execute(update_old_squad_query)
+                await session.execute(update_old_squad_query)
             update_query = update(User).where(User.id == user_id).values(in_squad = new_squad.id)
             await session.execute(update_query)
           
