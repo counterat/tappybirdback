@@ -315,9 +315,7 @@ async def mine_brd(user_id, is_autoclicker=False):
 
         print(f'{result}'*2)
         current_level_of_egg = result['current_level_of_egg']
-        if current_level_of_egg == 7:
-                await set_eggs_and_exp_to_max(user_id)
-                return 'buy egg'
+       
         hp_for_egg = eggs[current_level_of_egg]['hp']
         result['brds_for_tap'] = brds_for_tap
         print(current_level_of_egg, hp_for_egg, result['exp'], "loh")
