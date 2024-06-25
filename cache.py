@@ -510,7 +510,7 @@ async def choose_random_level(user_id, is_exclusive=False):
     else:
         for i in range(1):
             print(i)
-            tier = tiers[i]
+            tier = exclusive_tier[0]
             result = all(elem['id'] in birds for elem in tier)
             if not result:
                 allowed_tiers.append(i)
