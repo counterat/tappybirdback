@@ -186,7 +186,10 @@ async def choose_bird_for_user(user_id, tier):
     async with async_session() as session:
         user = await find_user_by_id(user_id)
         birds = user.birds
-        birds_in_this_tier = tiers[tier-1]
+        if tier > 0:
+            birds_in_this_tier = tiers[tier-1]
+        else:
+            birds_in_this_tier = exclusive_tier[0]
         print('birds_in_this_tier', birds_in_this_tier)
         ids_of_this_tier_birds = [] 
         for bird in birds_in_this_tier:
