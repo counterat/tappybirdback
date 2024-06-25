@@ -10,14 +10,7 @@ loop = asyncio.get_event_loop()
 
 """ {"user_id":{"time_worked" :0, "time_remained_to_work":12*60*60}} """
 r = aioredis.from_url("redis://16.170.242.255:6379", password="XGaaNySprD3", decode_responses=True)
-redis_pool = None
 
-async def get_redis_pool():
-    global redis_pool
-    if not redis_pool:
-        redis_pool = await aioredis.create_redis_pool(
-            'redis://16.170.242.255:6379', password='XGaaNySprD3', decode_responses=True)
-    return redis_pool
 async def get_last_task():
     keys = await r.hkeys("all_tasks")
     print(keys)
@@ -691,59 +684,51 @@ async def get_random_egg(user_id):
         except Exception as e:
             await pipe.reset()
             raise e
+
 async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy, delta_coins, is_energy_replenishment=False, telegram_id=''):
     try:
-        redis = await get_redis_pool()
+        # Получаем текущие данные пользователя
+        user_data = await r.hget('users', user_id)
+        user_data = json.loads(user_data) if user_data else {}
 
-        async with redis.pipeline(transaction=True) as pipe:
-            await pipe.watch(f'users:{user_id}')
+        if not user_data:
+            raise ValueError("User not found")
 
-            # Получаем текущие данные пользователя
-            user_data = await pipe.hget('users', user_id)
-            user_data = json.loads(user_data) if user_data else {}
+        # Выполняем вычисления и обновляем данные пользователя
+        current_currency = int(user_data.get("coins", 0))
+        current_total_coins_were_clicked = int(user_data.get('total_coins_were_clicked', 0))
+        current_energy = int(user_data.get("energy", 0))
+        current_exp = int(user_data.get("exp", 0))
+        income_per_this_day = user_data.get('income_per_this_day', 0)
 
-            if not user_data:
-                raise ValueError("User not found")
+        new_income_per_this_day = income_per_this_day + delta_coins
+        new_currency = current_currency + delta_coins
+        new_total_coins_were_clicked = current_total_coins_were_clicked + delta_coins
+        new_energy = min(user_data.get('max_energy', 0), current_energy + delta_energy)
+        new_exp = current_exp + delta_coins
 
-            # Выполняем вычисления и обновляем данные пользователя
-            current_currency = int(user_data.get("coins", 0))
-            current_total_coins_were_clicked = int(user_data.get('total_coins_were_clicked', 0))
-            current_energy = int(user_data.get("energy", 0))
-            current_exp = int(user_data.get("exp", 0))
-            income_per_this_day = user_data.get('income_per_this_day', 0)
+        # Обновляем данные в Redis
+        await r.hset('users', user_id, json.dumps({
+            **user_data,
+            "income_per_this_day": new_income_per_this_day,
+            "coins": new_currency,
+            "energy": new_energy,
+            "total_coins_were_clicked": new_total_coins_were_clicked,
+            "exp": new_exp
+        }))
 
-            new_income_per_this_day = income_per_this_day + delta_coins
-            new_currency = current_currency + delta_coins
-            new_total_coins_were_clicked = current_total_coins_were_clicked + delta_coins
-            new_energy = min(user_data.get('max_energy', 0), current_energy + delta_energy)
-            new_exp = current_exp + delta_coins
-
-            # Обновляем данные в Redis
-            pipe.multi()
-            await pipe.hset('users', user_id, json.dumps({
-                **user_data,
-                "income_per_this_day": new_income_per_this_day,
-                "coins": new_currency,
-                "energy": new_energy,
-                "total_coins_were_clicked": new_total_coins_were_clicked,
-                "exp": new_exp
-            }))
-            await pipe.execute()
-
-            # Возвращаем обновленные данные пользователя
-            return {
-                **user_data,
-                "income_per_this_day": new_income_per_this_day,
-                "coins": new_currency,
-                "energy": new_energy,
-                "total_coins_were_clicked": new_total_coins_were_clicked,
-                "exp": new_exp
-            }
+        # Возвращаем обновленные данные пользователя
+        return {
+            **user_data,
+            "income_per_this_day": new_income_per_this_day,
+            "coins": new_currency,
+            "energy": new_energy,
+            "total_coins_were_clicked": new_total_coins_were_clicked,
+            "exp": new_exp
+        }
 
     except Exception as e:
         raise e
-
-
 
   
 
