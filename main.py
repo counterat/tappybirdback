@@ -612,7 +612,7 @@ async def authorize_user(request: Request):
                     bird = BIRDLIST[users_bird-1]
                     users_birds.append(bird)
                 response['birds'] = users_birds
-                response['invite_link'] = official_channel_link+f'?start={user.invitation_code}'
+                response['invite_link'] = official_channel_link+f'?start={userr.invitation_code}'
                 return  response
         else:
             
@@ -659,7 +659,7 @@ async def authorize_user(request: Request):
                     bird = BIRDLIST[users_bird-1]
                     users_birds.append(bird)
                 response['birds'] = users_birds
-                response['invite_link'] = official_channel_link+f'?start={user.invitation_code}'
+                response['invite_link'] = official_channel_link+f'?start={userr.invitation_code}'
                 connected_users = get_global_variable()
                 
                 connected_users.add(userr.id)
