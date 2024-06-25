@@ -226,118 +226,56 @@ async def update_task_in_geo(key, new_value):
             await pipe.reset()
             print(f'{e}'*100)
             raise e
-
-
+async def get_hammer(value_dict):
+    hammers_dict = value_dict.get('hammers', {})
+    for hammer in ['diamond hammer', 'gold hammer', 'stone hammer']:
+        if hammer in hammers_dict:
+            return hammer, shop_items[hammer]['damage']
+    return None, 0        
+async def handle_new_bird(user_id, result, bird_id):
+    bird = BIRDLIST[bird_id - 1]
+    result['current_level_of_egg'] += 1
+    if result['current_level_of_egg'] == 7:
+        result['current_level_of_egg'] = 6
+        await setIsBlockedTrue(user_id)
+    else:
+        await add_user_level_of_egg(user_id)
+    exp_result = await update_exp(user_id, 0)
+    result['exp'] = exp_result['exp']
+    result['new_bird'] = bird
+    await append_bird_to_user(user_id, bird['id'])
 async def mine_brd(user_id, is_autoclicker=False):
-    value_json = await r.hget('users', user_id)
-    is_hammer = False
-    value_dict = json.loads(value_json)
-    brds_for_tap = 1
-    boosters_dict = value_dict.get('boosters')
-    hammers_dict = value_dict.get('hammers')
-    current_level_of_egg = value_dict['current_level_of_egg']
+    value_dict = await find_user_in_cache(user_id)
     if value_dict['isBlocked']:
         return 'buy egg'
-    if current_level_of_egg == 7:
-                await set_eggs_and_exp_to_max(user_id)
-                await setIsBlockedTrue(user_id)
-                return 'buy egg'
-    hammer = None
-    if boosters_dict.get('multitap') !={}:
-        brds_for_tap += 1*boosters_dict['multitap']['buff_level']
-    if hammers_dict.get('diamond hammer'):
-        is_hammer = True
-        hammer = 'diamond hammer'
-        egg = eggs[current_level_of_egg]
+    if value_dict['current_level_of_egg'] == 7:
+        await set_eggs_and_exp_to_max(user_id)
+        await setIsBlockedTrue(user_id)
+        return 'buy egg'
+
+    brds_for_tap = 1 + value_dict['boosters'].get('multitap', {}).get('buff_level', 0)
+    hammer, damage = await get_hammer(value_dict)
+
+    if hammer:
+        egg = eggs[value_dict['current_level_of_egg']]
         remained_hps_for_egg = egg['hp'] - value_dict['exp']
-        damage = shop_items[hammer]['damage']
-        if damage*egg['hp'] > remained_hps_for_egg:
-            brds_for_tap = remained_hps_for_egg
-        else:
-            brds_for_tap = damage*egg['hp']
-    if hammers_dict.get('gold hammer'):
-        is_hammer = True
-        hammer = 'gold hammer'
-        egg = eggs[current_level_of_egg]
-        remained_hps_for_egg = egg['hp'] - value_dict['exp']
-        damage = shop_items[hammer]['damage']
-        if damage*egg['hp'] > remained_hps_for_egg:
-            brds_for_tap = remained_hps_for_egg
-        else:
-            brds_for_tap = damage*egg['hp']
-    if hammers_dict.get('stone hammer'):
-        is_hammer = True
-        hammer = 'stone hammer'
-        egg = eggs[current_level_of_egg]
-        remained_hps_for_egg = egg['hp'] - value_dict['exp']
-        damage = shop_items[hammer]['damage']
-        if damage*egg['hp'] > remained_hps_for_egg:
-            brds_for_tap = remained_hps_for_egg
-        else:
-            brds_for_tap = damage*egg['hp']
+        brds_for_tap = min(brds_for_tap, damage * egg['hp'], remained_hps_for_egg)
 
     if is_autoclicker:
-        if not is_hammer:
-            if 60*brds_for_tap > 180:
-                brds_for_tap = 3
-        result = await update_user_energy_and_coin_balance_transaction(user_id, -60*brds_for_tap,  60*brds_for_tap, )
-        current_level_of_egg = result['current_level_of_egg']
-        if current_level_of_egg == 7:
-            await setIsBlockedTrue(user_id)
-        hp_for_egg = eggs[current_level_of_egg]['hp']
-        if result['exp'] >= hp_for_egg:
-            
-            bird_id = await choose_bird_for_user(user_id, current_level_of_egg)
-            if bird_id == 'all':
-                return 'buy egg'
-            bird = BIRDLIST[bird_id-1]
-
-            result['current_level_of_egg'] += 1
-            if result['current_level_of_egg'] == 7:
-                result['current_level_of_egg'] = 6
-                await setIsBlockedTrue(user_id)
-            else:
-                await add_user_level_of_egg(user_id)
-            exp_result  = await update_exp(user_id, 0)
-            result['exp'] = exp_result['exp']
-            result['new_bird']  = bird
-          
-                
-            await append_bird_to_user(user_id, bird['id'])
+        brds_for_tap = min(brds_for_tap, 3) if not hammer else brds_for_tap
+        result = await update_user_energy_and_coin_balance_transaction(user_id, -60 * brds_for_tap, 60 * brds_for_tap)
     else:
-        if not is_hammer:
-            result = await update_user_energy_and_coin_balance_transaction(user_id, -1*brds_for_tap, brds_for_tap)
-        else:
-            await setNoneHammer(user_id, hammer)
-            print(brds_for_tap, 'brds_for_tap' )
-            result = await update_user_energy_and_coin_balance_transaction(user_id, 0, brds_for_tap)
+        result = await update_user_energy_and_coin_balance_transaction(user_id, -1 * brds_for_tap, brds_for_tap) if not hammer else await setNoneHammer_and_update(user_id, hammer, brds_for_tap)
 
+    if result['current_level_of_egg'] == 7:
+        await setIsBlockedTrue(user_id)
 
-        print(f'{result}'*2)
-        current_level_of_egg = result['current_level_of_egg']
-       
-        hp_for_egg = eggs[current_level_of_egg]['hp']
-        result['brds_for_tap'] = brds_for_tap
-        print(current_level_of_egg, hp_for_egg, result['exp'], "loh")
-        if result['exp'] >= hp_for_egg:
-            
-            bird_id = await choose_bird_for_user(user_id, current_level_of_egg)
-            if bird_id == 'all':
-                return 'buy egg'
-            bird = BIRDLIST[bird_id-1]
-
-            result['current_level_of_egg'] += 1
-            if result['current_level_of_egg'] == 7:
-                result['current_level_of_egg'] = 6
-                await setIsBlockedTrue(user_id)
-            else:
-                await add_user_level_of_egg(user_id)
-            exp_result  = await update_exp(user_id, 0)
-            result['exp'] = exp_result['exp']
-            result['new_bird']  = bird
-            if result['current_level_of_egg'] == 7:
-                await setIsBlockedTrue(user_id)
-            await append_bird_to_user(user_id, bird['id'])
+    if result['exp'] >= eggs[result['current_level_of_egg']]['hp']:
+        bird_id = await choose_bird_for_user(user_id, result['current_level_of_egg'])
+        if bird_id == 'all':
+            return 'buy egg'
+        await handle_new_bird(user_id, result, bird_id)
+    
     return result
 import decimal
 
@@ -743,7 +681,7 @@ async def get_random_egg(user_id):
 
 
 async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy, delta_coins, is_energy_replenishment = False, telegram_id=''):
-    new_updated = datetime.isoformat(datetime.now())
+    """ new_updated = datetime.isoformat(datetime.now()) """
     async with r.pipeline(transaction=True) as pipe:
         try:
             # Начинаем транзакцию
@@ -762,11 +700,11 @@ async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy,
             current_last_time_updated = user_data.get('last_updated')
             last_hundred_clicks = user_data.get('last_hundred_clicks')
             income_per_this_day = user_data['income_per_this_day']
-            if not last_hundred_clicks:
-                new_hundred_clicks = []
-            if delta_coins ==0:
-                new_updated = current_last_time_updated
-            if current_last_time_updated:
+            """ if not last_hundred_clicks:
+                new_hundred_clicks = [] """
+            """ if delta_coins ==0:
+                new_updated = current_last_time_updated """
+            """ if current_last_time_updated:
                 diff = unix_time(new_updated)-unix_time(current_last_time_updated)
                 updated_diffs.append(diff.total_seconds()*1000)
 
@@ -783,7 +721,7 @@ async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy,
                         
                     else:
                         last_hundred_clicks.append(diff.total_seconds()*1000)
-                        new_hundred_clicks = last_hundred_clicks
+                        new_hundred_clicks = last_hundred_clicks """
             # Обновляем данные пользователя
             new_income_per_this_day = income_per_this_day + delta_coins
             new_currency = current_currency + delta_coins
@@ -822,8 +760,8 @@ async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy,
                 "income_per_this_day":new_income_per_this_day,
                 "coins": new_currency,
                 "energy": new_energy,
-                "last_updated": new_updated,
-                'last_hundred_clicks':new_hundred_clicks,
+                #"last_updated": new_updated,
+                #'last_hundred_clicks':new_hundred_clicks,
                 'total_coins_were_clicked':new_current_total_coins_were_clicked,
                 "exp":new_exp
             }))

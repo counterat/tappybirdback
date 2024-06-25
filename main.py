@@ -51,29 +51,33 @@ async def update_all_users_energy():
             user_ids = await r.hkeys('users')
             for user_id in user_ids:
                 if user_id != '':
-                    user_data = await pipe.hget('users', (user_id))
-                    user_data_list = await pipe.execute()
-                    for user_data in user_data_list:
-                        
-                        user_data = json.loads(user_data)
+                    try:
+                        user_data = await pipe.hget('users', (user_id))
+                        user_data_list = await pipe.execute()
+                        for user_data in user_data_list:
+                            
+                            user_data = json.loads(user_data)
+                            print(user_data)
+                            if user_data['energy'] != user_data['max_energy']:
+                                user = await find_user_by_id(int(user_id))
+                                print(user.to_dict())
+                                res = await update_user_energy_and_coin_balance_transaction(int(user_id), 6, 0, True, user.telegram_id)
+                                print(res)
+                                
+                                res['id'] = int(user_id)
+                                await broadcast_message(json.dumps({"eventname":"energy_replenishment", **res}))
+                    except Exception as ex:
                         print(user_data)
-                        if user_data['energy'] != user_data['max_energy']:
-                            user = await find_user_by_id(int(user_id))
-                            print(user.to_dict())
-                            res = await update_user_energy_and_coin_balance_transaction(int(user_id), 6, 0, True, user.telegram_id)
-                            print(res)
-                            res['id'] = int(user_id)
-                            await broadcast_message(json.dumps({"eventname":"energy_replenishment", **res}))
-
+                        print(ex, '\n'*2)
 
 
 scheduler = AsyncIOScheduler()
 
 scheduler.add_job(update_all_users_energy, 'interval', seconds=2) 
-scheduler.add_job(click_for_autoclicker_users, 'interval', seconds=60)
+""" scheduler.add_job(click_for_autoclicker_users, 'interval', seconds=60)
 scheduler.add_job(update_users_leaderboard, 'interval', seconds=1) 
 scheduler.add_job(update_squads_leaderboard, 'interval', seconds=1) 
-scheduler.add_job(update_all_users_income_per_day, CronTrigger(hour=0, minute=0))
+scheduler.add_job(update_all_users_income_per_day, CronTrigger(hour=0, minute=0)) """
 
 scheduler.start()
 active_websockets: List[WebSocket] = []
