@@ -492,21 +492,22 @@ async def disconnect_ws_handler(request:Request):
         return HTTPException(403)
 @app.post('/minecoin')
 async def mine_coin_handler(request: Request):
-    """  data = await request.json()
-    user_id = data.get('userId') """
-    connected_users = get_global_variable()
-    print(f'{connected_users}pizda'*90)
     data = await request.json()
     user_id = data['userId']
-    res = await mine_brd(user_id)
+    
+    # Запускаем выполнение mine_brd в фоновом режиме
+    task = asyncio.create_task(mine_brd(user_id))
+    
+    # Дожидаемся завершения выполнения mine_brd и получаем результат
+    res = await task
+    
+    # Возвращаем результат в зависимости от условий
     if res == 'buy egg':
         return 'buy egg'
-    print(res)
-    if res =='autoclicker!!!':
+    elif res == 'autoclicker!!!':
         return 'autoclicker!!!'
-   
-    return res
-
+    else:
+        return res
 @app.post('/successful_transaction')
 async def succesful_transaction(request:Request):
     data = await request.json()

@@ -249,40 +249,57 @@ async def handle_new_bird(user_id, result, bird_id):
 async def setNoneHammer_and_update(user_id, hammer, brds_for_tap):
     await setNoneHammer(user_id, hammer)
     return await update_user_energy_and_coin_balance_transaction(user_id, 0, brds_for_tap)
-
 async def mine_brd(user_id, is_autoclicker=False):
-    value_dict = await find_user_in_cache(user_id)
-    if value_dict['isBlocked']:
-        return 'buy egg'
-    if value_dict['current_level_of_egg'] == 7:
-        await set_eggs_and_exp_to_max(user_id)
-        await setIsBlockedTrue(user_id)
-        return 'buy egg'
+    try:
+        # Получаем данные пользователя из кэша или из Redis
+        value_dict = await find_user_in_cache(user_id)
 
-    brds_for_tap = 1 + value_dict['boosters'].get('multitap', {}).get('buff_level', 0)
-    hammer, damage = await get_hammer(value_dict)
-
-    if hammer:
-        egg = eggs[value_dict['current_level_of_egg']]
-        remained_hps_for_egg = egg['hp'] - value_dict['exp']
-        brds_for_tap = min(brds_for_tap, damage * egg['hp'], remained_hps_for_egg)
-
-    if is_autoclicker:
-        brds_for_tap = min(brds_for_tap, 3) if not hammer else brds_for_tap
-        result = await update_user_energy_and_coin_balance_transaction(user_id, -60 * brds_for_tap, 60 * brds_for_tap)
-    else:
-        result = await update_user_energy_and_coin_balance_transaction(user_id, -1 * brds_for_tap, brds_for_tap) if not hammer else await setNoneHammer_and_update(user_id, hammer, brds_for_tap)
-
-    if result['current_level_of_egg'] == 7:
-        await setIsBlockedTrue(user_id)
-
-    if result['exp'] >= eggs[result['current_level_of_egg']]['hp']:
-        bird_id = await choose_bird_for_user(user_id, result['current_level_of_egg'])
-        if bird_id == 'all':
+        # Проверяем блокировку пользователя
+        if value_dict['isBlocked']:
             return 'buy egg'
-        await handle_new_bird(user_id, result, bird_id)
-    
-    return result
+
+        # Проверяем, достиг ли пользователь максимального уровня яйца
+        if value_dict['current_level_of_egg'] == 7:
+            await set_eggs_and_exp_to_max(user_id)
+            await setIsBlockedTrue(user_id)
+            return 'buy egg'
+
+        # Вычисляем количество ударов (brds_for_tap)
+        brds_for_tap = 1 + value_dict['boosters'].get('multitap', {}).get('buff_level', 0)
+        hammer, damage = await get_hammer(value_dict)
+
+        # Если есть молоток, вычисляем минимальное количество ударов
+        if hammer:
+            egg = eggs[value_dict['current_level_of_egg']]
+            remained_hps_for_egg = egg['hp'] - value_dict['exp']
+            brds_for_tap = min(brds_for_tap, damage * egg['hp'], remained_hps_for_egg)
+
+        # Обновляем баланс энергии и монет пользователя
+        if is_autoclicker:
+            brds_for_tap = min(brds_for_tap, 3) if not hammer else brds_for_tap
+            result = await update_user_energy_and_coin_balance_transaction(user_id, -60 * brds_for_tap, 60 * brds_for_tap)
+        else:
+            if hammer:
+                result = await setNoneHammer_and_update(user_id, hammer, brds_for_tap)
+            else:
+                result = await update_user_energy_and_coin_balance_transaction(user_id, -1 * brds_for_tap, brds_for_tap)
+
+        # Проверяем, достиг ли пользователь максимального уровня яйца после обновления
+        if result['current_level_of_egg'] == 7:
+            await setIsBlockedTrue(user_id)
+
+        # Если пользователь набрал достаточно опыта для новой птицы
+        if result['exp'] >= eggs[result['current_level_of_egg']]['hp']:
+            bird_id = await choose_bird_for_user(user_id, result['current_level_of_egg'])
+            if bird_id == 'all':
+                return 'buy egg'
+            await handle_new_bird(user_id, result, bird_id)
+
+        return result
+
+    except Exception as e:
+        raise e
+
 import decimal
 
 async def setNoneHammer(user_id, item_name):
