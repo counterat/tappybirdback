@@ -585,6 +585,8 @@ boosters = {
 
 ton_to_tappy_currency = 100
 shop_items = {
+
+"exclusive egg":{'price':1*ton_to_tappy_currency},
 'random egg':{'price':0.9*ton_to_tappy_currency},
 'stone hammer':{"price":0.25*ton_to_tappy_currency, "damage":0.25},
 'gold hammer':{"price":0.5*ton_to_tappy_currency, "damage":0.75},
