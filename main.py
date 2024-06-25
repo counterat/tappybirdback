@@ -48,14 +48,21 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 async def update_all_users_energy():
     try:
         async with r.pipeline(transaction=True) as pipe:
-            async for user_id in r.ihkeys('users'):
+            hk = await r.hkeys('users')
+            for user_id in hk:
+                print(user_id, 'coach')
+                if user_id == '':
+                    continue
+                user_id = int(user_id)
                 try:
                     user_data = await r.hget('users', user_id)
                     if user_data:
+                    
                         user_data = json.loads(user_data)
                         if user_data['energy'] != user_data['max_energy']:
                             user = await find_user_by_id(int(user_id))
                             res = await update_user_energy_and_coin_balance_transaction(int(user_id), 6, 0, True, user.telegram_id)
+                            print(res, 'res')
                             res['id'] = int(user_id)
                             await broadcast_message(json.dumps({"eventname": "energy_replenishment", **res}))
                 except Exception as ex:

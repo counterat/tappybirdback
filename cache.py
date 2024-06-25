@@ -720,7 +720,8 @@ async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy,
         new_income_per_this_day = user_data.get('income_per_this_day', 0) + delta_coins
         new_currency = int(user_data.get("coins", 0)) + delta_coins
         new_total_coins_were_clicked = int(user_data.get('total_coins_were_clicked', 0)) + delta_coins
-        new_energy = current_energy - brds_for_tap
+        new_energy = current_energy + delta_energy
+    
         new_exp = int(user_data.get("exp", 0)) + delta_coins
 
         # Обновляем данные в Redis
