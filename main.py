@@ -69,7 +69,7 @@ async def update_all_users_energy():
 
 scheduler = AsyncIOScheduler()
 
-scheduler.add_job(update_all_users_energy, 'interval', seconds=2)
+""" scheduler.add_job(update_all_users_energy, 'interval', seconds=2) """
 """ scheduler.add_job(click_for_autoclicker_users, 'interval', seconds=60)
 scheduler.add_job(update_users_leaderboard, 'interval', seconds=1) 
 scheduler.add_job(update_squads_leaderboard, 'interval', seconds=1) 
