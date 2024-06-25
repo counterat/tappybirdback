@@ -6,7 +6,7 @@ discord_client_secret = 'B6Q80pkS8j1qV4U3EsUZg2jlEhxj526Q'
 
 bot_token = '6986907470:AAFGGwdxSoYAPbOA14qi5kPKwG4uFYltD4k'
 
-official_channel_link = 'https://t.me/tappybird'
+official_channel_link = 'https://t.me/tappycoinbot'
 admin_credentials = {
     'login':'admin',
     'password':'admin'
