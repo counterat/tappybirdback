@@ -701,7 +701,6 @@ async def get_random_egg(user_id):
         except Exception as e:
             await pipe.reset()
             raise e
-
 async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy, delta_coins, is_energy_replenishment=False, telegram_id=''):
     try:
         # Получаем текущие данные пользователя
@@ -711,18 +710,18 @@ async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy,
         if not user_data:
             raise ValueError("User not found")
 
-        # Выполняем вычисления и обновляем данные пользователя
-        current_currency = int(user_data.get("coins", 0))
-        current_total_coins_were_clicked = int(user_data.get('total_coins_were_clicked', 0))
+        # Вычисляем новое значение для energy и проверяем условие
         current_energy = int(user_data.get("energy", 0))
-        current_exp = int(user_data.get("exp", 0))
-        income_per_this_day = user_data.get('income_per_this_day', 0)
+        if delta_energy > current_energy:
+            raise ValueError("Not enough energy")
 
-        new_income_per_this_day = income_per_this_day + delta_coins
-        new_currency = current_currency + delta_coins
-        new_total_coins_were_clicked = current_total_coins_were_clicked + delta_coins
-        new_energy = min(user_data.get('max_energy', 0), current_energy + delta_energy)
-        new_exp = current_exp + delta_coins
+        # Вычисляем brds_for_tap и обновляем данные пользователя
+        brds_for_tap = delta_coins
+        new_income_per_this_day = user_data.get('income_per_this_day', 0) + delta_coins
+        new_currency = int(user_data.get("coins", 0)) + delta_coins
+        new_total_coins_were_clicked = int(user_data.get('total_coins_were_clicked', 0)) + delta_coins
+        new_energy = current_energy - brds_for_tap
+        new_exp = int(user_data.get("exp", 0)) + delta_coins
 
         # Обновляем данные в Redis
         await r.hset('users', user_id, json.dumps({
@@ -734,18 +733,20 @@ async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy,
             "exp": new_exp
         }))
 
-        # Возвращаем обновленные данные пользователя
+        # Возвращаем обновленные данные пользователя вместе с brds_for_tap
         return {
             **user_data,
             "income_per_this_day": new_income_per_this_day,
             "coins": new_currency,
             "energy": new_energy,
             "total_coins_were_clicked": new_total_coins_were_clicked,
-            "exp": new_exp
+            "exp": new_exp,
+            "brds_for_tap": brds_for_tap  # Добавляем brds_for_tap в результат
         }
 
     except Exception as e:
         raise e
+
 
   
 
