@@ -542,7 +542,7 @@ async def buy_booster_handler(request:Request):
             return result
     return HTTPException(403)
 
-isTest = False
+isTest = True
 @app.get('/tonconnect-manifest.json')
 async def return_tonconnect_manifest(request:Request):
     return  {
@@ -552,127 +552,72 @@ async def return_tonconnect_manifest(request:Request):
   "termsOfUseUrl": "https://ton-connect.github.io/demo-dapp-with-react-ui/terms-of-use.txt",
   "privacyPolicyUrl": "https://ton-connect.github.io/demo-dapp-with-react-ui/privacy-policy.txt"
   }
-
 @app.post('/authorize')
 async def authorize_user(request: Request):
-        client_host = request.client.host
-        print(client_host)
-        if client_host != '127.0.0.1':
-            country_code = get_country_by_ip(client_host)
-            region = get_regions_by_country(country_code)[0] 
-        else:
-            region = 'EUROPE'
-        if not isTest:
-            data = await request.json()
-            initdata = data['initdata']
-            print(initdata)
-            invit_code = data.get('invitCode')
-            result,vals = validate_initdata(initdata, bot_token)
-            print(result,vals)
-            vals = json.loads(vals['user'])
-            if result:
-                user_id = vals['id']
-            else:
-                return HTTPException(403)
-            user = await find_user_by_telegram_id(user_id)
-            connected_users = get_global_variable()
-            if user:
-                
-                if not connected_users:
-                    connected_users = set()
-                else:
-                    connected_users.add(user_id)
-                set_global_variable(connected_users)
-                res = await find_user_in_cache(user.id)
-              
-                response ={
-**user.to_dict(),
-**res
-                }
-                users_birds = []
-                for users_bird  in user.birds:
-                    bird = BIRDLIST[users_bird-1]
-                    users_birds.append(bird)
-                response['birds'] = users_birds
-                response['invite_link'] = official_channel_link+f'?start={user.invitation_code}'
-                return  response
-            else:
-                
-                set_global_variable(connected_users)
-                userr = await add_user(vals['id'],vals['first_name'], vals.get('username'),datetime.now(), invit_code, geo=region)
-                
-                res =await new_user(userr.id, default_config_for_user)
-                connected_users = get_global_variable()
-                if not connected_users:
-                    connected_users = set()
-                else:
-                    connected_users.add(userr.id)
-                res = json.loads(res)
-                response ={
-**userr.to_dict(),
-**res
-                }
-                users_birds = []
-                for users_bird  in userr.birds:
-                    bird = BIRDLIST[users_bird-1]
-                    users_birds.append(bird)
-                response['birds'] = users_birds
-                response['invite_link'] = official_channel_link+f'?start={userr.invitation_code}'
-                return  response
-        else:
-            
-            tg_id = 881704893
-            first_name = 'leps'
-            username = 'leps'
-            invit_code = 150004449
-            user = await find_user_by_telegram_id(tg_id)
-            if user:
-                res = await find_user_in_cache(user.id)
-                response ={
-**user.to_dict(),
-**res
-                }
-                users_birds = []
-                for users_bird  in user.birds:
-                    bird = BIRDLIST[users_bird-1]
-                    users_birds.append(bird)
-                response['birds'] = users_birds
-                response['invite_link'] = official_channel_link+f'?start={user.invitation_code}'
-                connected_users = get_global_variable()
-                
-                connected_users.add(user.id)
-                tap_bot = await find_tap_bot_in_cache((user.id))
-                if tap_bot:
-                    if tap_bot['time_remained_to_work'] <= 0:
-                        await update_tap_bot(user.id,{"time_worked" :0, "time_remained_to_work":60} )
-                
-                print(connected_users, 'haha'*90)
-                set_global_variable(connected_users)
-                return  response
-              
-            else:
-                userr = await add_user(tg_id,first_name, username,datetime.now(), invit_code, geo=region)
-                res =await new_user(userr.id, default_config_for_user)
-                res = json.loads(res)
-                print(type(res), 'kasta'*50)
-                response ={
-**userr.to_dict(),
-**res
-                }
-                users_birds = []
-                for users_bird  in userr.birds:
-                    bird = BIRDLIST[users_bird-1]
-                    users_birds.append(bird)
-                response['birds'] = users_birds
-                response['invite_link'] = official_channel_link+f'?start={userr.invitation_code}'
-                connected_users = get_global_variable()
-                
-                connected_users.add(userr.id)
-                print(connected_users, 'haha'*90)
-                set_global_variable(connected_users)
-                return  response
-            
-
+    client_host = request.client.host
+    print(client_host)
+    
+    if client_host != '127.0.0.1':
+        country_code = get_country_by_ip(client_host)
+        region = get_regions_by_country(country_code)[0]
+    else:
+        region = 'EUROPE'
+    
+    if isTest:
+        tg_id = 881704893
+        first_name = 'leps'
+        username = 'leps'
+        invit_code = 150004449
+    else:
+        data = await request.json()
+        initdata = data['initdata']
+        invit_code = data.get('invitCode')
+        
+        result, vals = validate_initdata(initdata, bot_token)
+        if not result:
+            raise HTTPException(status_code=403, detail="Unauthorized")
+        
+        tg_id = vals['id']
+        first_name = vals['first_name']
+        username = vals.get('username')
+    
+    user = await find_user_by_telegram_id(tg_id)
+    
+    if user:
+        connected_users = get_global_variable() or set()
+        connected_users.add(user.id)
+        set_global_variable(connected_users)
+        
+        res = await find_user_in_cache(user.id)
+        response = {
+            **user.to_dict(),
+            **res
+        }
+        
+        users_birds = [BIRDLIST[bird_id - 1] for bird_id in user.birds]
+        response['birds'] = users_birds
+        response['invite_link'] = official_channel_link + f'?start={user.invitation_code}'
+        
+        return response
+    else:
+        connected_users = get_global_variable() or set()
+        userr = await add_user(tg_id, first_name, username, datetime.now(), invit_code, geo=region)
+        res = await new_user(userr.id, default_config_for_user)
+        res = json.loads(res)
+        
+        connected_users.add(userr.id)
+        set_global_variable(connected_users)
+        
+        response = {
+            **userr.to_dict(),
+            **res
+        }
+        
+        users_birds = [BIRDLIST[bird_id - 1] for bird_id in userr.birds]
+        response['birds'] = users_birds
+        response['invite_link'] = official_channel_link + f'?start={userr.invitation_code}'
+        
+        return response
 async def main():
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 
