@@ -487,25 +487,39 @@ async def append_completed_tasks_to_user(user_id, task_id):
             raise e
 
 
-async def choose_random_level(user_id):
+async def choose_random_level(user_id, is_exclusive=False):
     user = await find_user_by_id(user_id)
     birds = user.birds 
     allowed_tiers = []
-    for i in range(1,6):
-        print(i)
-        tier = tiers[i]
-        result = all(elem in birds for elem in tier)
-        if not result:
-            allowed_tiers.append(i)
-    print(allowed_tiers)
-    if allowed_tiers:
-        import random
-        choice  =random.choice(allowed_tiers)
-        print(choice, 'choice')
-        return choice+1
+    if not is_exclusive:
+
+        for i in range(1,6):
+            print(i)
+            tier = tiers[i]
+            result = all(elem['id'] in birds for elem in tier)
+            if not result:
+                allowed_tiers.append(i)
+        print(allowed_tiers)
+        if allowed_tiers:
+            import random
+            choice  =random.choice(allowed_tiers)
+            print(choice, 'choice')
+            return choice+1
+        else:
+            return 'no more eggs'
     else:
-        return 'no more eggs'
-        
+        for i in range(1):
+            print(i)
+            tier = tiers[i]
+            result = all(elem['id'] in birds for elem in tier)
+            if not result:
+                allowed_tiers.append(i)
+        print(allowed_tiers)
+        if allowed_tiers:
+            
+            return 0
+        else:
+            return 'no more eggs'
 
 async def buy_shop_item_cache(user_id, item_name):
     async with r.pipeline(transaction=True) as pipe:
@@ -520,6 +534,13 @@ async def buy_shop_item_cache(user_id, item_name):
                 print(f'{hammers_dict}'*30)
             elif 'random' in item_name:
                 random_level = await choose_random_level(user_id)
+                if random_level == 'no more eggs':
+                    return random_level
+                user_data["isBlocked"] = False
+                user_data['current_level_of_egg'] = random_level
+                user_data['exp'] = 0
+            elif 'exclusive' in item_name:
+                random_level = await choose_random_level(user_id, True)
                 if random_level == 'no more eggs':
                     return random_level
                 user_data["isBlocked"] = False

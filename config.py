@@ -540,7 +540,7 @@ fifth_tier_birds = BIRDLIST[40:50]
 
 sixth_tier_birds  = BIRDLIST[50:60]
 
-
+exclusive_tier = [exclusive_birds]
 
 
 tiers = [
@@ -568,6 +568,7 @@ def get_regions_by_country(country_code):
     return found_regions if found_regions else ["Неизвестный регион"]
 
 eggs = {
+    0:{'hp':2500000},
     1:{'hp':5000},
     2:{'hp': 250000},
     3:{'hp':1000000},
