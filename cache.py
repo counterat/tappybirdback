@@ -778,8 +778,8 @@ async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy,
                     "income_per_this_day":new_income_per_this_day,
                 "coins": new_currency,
                 "energy": new_energy,
-                "last_updated": new_updated,
-                'last_hundred_clicks':new_hundred_clicks,
+                #"last_updated": new_updated,
+                #'last_hundred_clicks':new_hundred_clicks,
                 'total_coins_were_clicked':new_current_total_coins_were_clicked,
                 "exp":new_exp
                 }
