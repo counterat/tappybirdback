@@ -576,6 +576,7 @@ async def authorize_user(request: Request):
         result, vals = validate_initdata(initdata, bot_token)
         if not result:
             raise HTTPException(status_code=403, detail="Unauthorized")
+        vals = json.loads(vals['user'])
         print(vals, initdata, '\n*5')
         tg_id = vals['id']
         first_name = vals['first_name']
