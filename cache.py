@@ -244,6 +244,11 @@ async def handle_new_bird(user_id, result, bird_id):
     result['exp'] = exp_result['exp']
     result['new_bird'] = bird
     await append_bird_to_user(user_id, bird['id'])
+
+async def setNoneHammer_and_update(user_id, hammer, brds_for_tap):
+    await setNoneHammer(user_id, hammer)
+    return await update_user_energy_and_coin_balance_transaction(user_id, 0, brds_for_tap)
+
 async def mine_brd(user_id, is_autoclicker=False):
     value_dict = await find_user_in_cache(user_id)
     if value_dict['isBlocked']:
