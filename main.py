@@ -223,6 +223,7 @@ async def handle_comment_on_socnet_task(user_id,task_id):
             
            
             result = await has_commented(user.telegram_id,href)
+            print(result, 'await has_commented(user.telegram_id,href)'*30)
             if result:
                 await append_completed_tasks_to_user(user_id, task_id)
                 user = await update_user_energy_and_coin_balance_transaction(user_id, 0, task['reward'])
@@ -401,7 +402,7 @@ async def check_is_task_completed(request: Request):
         if subtasks:
             print('huyatina', task)
             completed_subtasks = []
-            for task_id in subtasks:
+            for subtask_id in subtasks:
                 subtask = await find_task_in_cache(task_id)
                 if task_id not in user['completed_tasks']:
                     if subtask['id'] not in user['completed_tasks']:
