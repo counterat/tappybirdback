@@ -102,8 +102,9 @@ async def find_all_purchases(user_id, booster_name):
 async def update_tappy_balance(user_id, delta_value):
     async with async_session() as session:
         user = await find_user_by_id(user_id)
+        
         new_balance = user.balance_in_tappycoin + decimal.Decimal(str(delta_value))
-        print(new_balance, 'zarabotal'*100)
+        print(decimal.Decimal(str(delta_value)),new_balance, 'zarabotal'*100)
         update_query = update(User).where(User.id == user_id).values(balance_in_tappycoin = new_balance)
         async with session.begin():
             await session.execute(update_query)
