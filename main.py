@@ -64,10 +64,13 @@ async def update_all_users_energy():
                             delta_energy = 0
                             user = await find_user_by_id(int(user_id))
                             if user_data['energy'] + delta_energy > user_data['max_energy']:
+                                
                                 delta_energy = user_data['max_energy'] - user_data['energy']
+                                print(delta_energy, 'kros'*100)
                                 res = await update_user_energy_and_coin_balance_transaction(int(user_id), delta_energy, 0, True, user.telegram_id)
                             
                             else:
+                                print('pidor'*100)
                                 delta_energy = 6
                                 res = await update_user_energy_and_coin_balance_transaction(int(user_id), delta_energy, 0, True, user.telegram_id)
                             
