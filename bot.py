@@ -27,8 +27,11 @@ async def get_chat_title(link):
 
 async def is_user_in_channel(user_id, channel):
     try:
+        
         chat_member = await bot.get_chat_member(chat_id=channel, user_id=user_id)
-        return chat_member
+        members_statuses = ['creator', 'administrator', 'member', 'restricted']
+        if chat_member.status in members_statuses:
+            return chat_member
     except Exception as ex:
         print(ex)
 

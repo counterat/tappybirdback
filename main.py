@@ -23,11 +23,12 @@ async def has_commented(user_id: int, chat_href: int) -> bool:
     async with pyro:
         username = extract_username(chat_href)
         result = pyro.get_chat_history(f'@{username}')
-
+        
         async for message in result :
             if message.from_user:
                 if message.from_user.id == user_id:
                     return True
+                    
 import jwt
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
