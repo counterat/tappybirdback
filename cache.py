@@ -734,7 +734,7 @@ async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy,
             if new_total_coins_were_clicked >= 100:
                 user_data['is_approved'] = True
                 user_data['income_for_ref'] += 50000
-        new_energy = current_energy - brds_for_tap
+        new_energy = current_energy + delta_energy
         if is_energy_replenishment:
             new_energy = current_energy+delta_energy
         new_exp = int(user_data.get("exp", 0)) + delta_coins
