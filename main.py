@@ -231,12 +231,13 @@ async def handle_comment_on_socnet_task(user_id,task_id):
                 user_in_db = await find_user_by_id(user_id)
 
                 return {**user, **user_in_db.to_dict()}
-        await append_completed_tasks_to_user(user_id, task_id)
-        user = await update_user_energy_and_coin_balance_transaction(user_id, 0, task['reward'])
-        await update_tappy_balance(user_id, task['reward_in_tappy'])
-        user_in_db = await find_user_by_id(user_id)
+        else:
+            await append_completed_tasks_to_user(user_id, task_id)
+            user = await update_user_energy_and_coin_balance_transaction(user_id, 0, task['reward'])
+            await update_tappy_balance(user_id, task['reward_in_tappy'])
+            user_in_db = await find_user_by_id(user_id)
 
-        return {**user, **user_in_db.to_dict()}
+            return {**user, **user_in_db.to_dict()}
 
 def auth_by_token(sign):
     print(jwt.decode(sign, "secret_key", algorithms="HS256"))
