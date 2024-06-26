@@ -61,9 +61,9 @@ async def update_all_users_energy():
                         user_data = json.loads(user_data)
                   
                         if user_data['energy'] < user_data['max_energy']:
-                            delta_energy = 0
+                            
                             user = await find_user_by_id(int(user_id))
-                            if user_data['energy'] + delta_energy > user_data['max_energy']:
+                            if user_data['energy'] + 6 > user_data['max_energy']:
                                 
                                 delta_energy = user_data['max_energy'] - user_data['energy']
                                 print(delta_energy, 'kros'*100)
