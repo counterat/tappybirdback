@@ -29,7 +29,7 @@ async def get_last_task():
 
 async def find_telegram_id(link):
     user_data = await r.hget('telegram_ids', link)
-    user_data = json.loads(user_data)
+    user_data = int(user_data)
     return user_data
 
 async def find_user_in_cache(user_id):
