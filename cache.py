@@ -709,6 +709,7 @@ async def get_random_egg(user_id):
             raise e
 async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy, delta_coins, is_energy_replenishment=False, telegram_id=''):
     try:
+        print('\n'*5, delta_energy,delta_coins ,'\n'*5)
         # Получаем текущие данные пользователя
         user_data = await r.hget('users', user_id)
         user_data = json.loads(user_data) if user_data else {}
