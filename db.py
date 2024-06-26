@@ -55,7 +55,7 @@ class User(TappyBird):
     birds = Column(ARRAY(Integer), default = [])
     times_multitap_was_used = Column(Integer, default=0)
     times_max_energy_was_used = Column(Integer, default=0)
-    times_autoclicker_was_used = Column(Integer, default=0)
+    photo_url = Column(String, default = 'https://telegra.ph/file/99e7fb4ff14703f8d0d7f.png')
     sign = Column(String)
     invited_by = Column(BigInteger)
     balance_in_ton = Column(DECIMAL, default=0)
@@ -101,6 +101,6 @@ async def drop_all_tables():
 async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-
-""" import asyncio
-asyncio.run(create_tables())    """
+""" 
+import asyncio
+asyncio.run(create_tables())   """ 

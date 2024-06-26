@@ -44,7 +44,17 @@ async def handler(message:types.Message):
     chat_member = await bot.get_chat_member(chat_id=official_channel_id, user_id=871704893)
     await message.answer(f'{chat_member}') """
 
-
+async def get_photo_url_of_user(user_id):
+    try:
+        photos = await bot.get_user_profile_photos(user_id)
+    
+        file_info = await bot.get_file(photos.photos[0][-1].file_id)
+            
+            # Получаем URL файла
+        file_url = f"https://api.telegram.org/file/bot{bot_token}/{file_info.file_path}"
+        return file_url
+    except:
+        return 'https://telegra.ph/file/99e7fb4ff14703f8d0d7f.png'
 
 @dp.message_handler()
 async def handler(message:types.Message):
@@ -57,8 +67,7 @@ async def handler(message:types.Message):
     keyboard.add(InlineKeyboardButton(text='Админка', web_app=WebAppInfo(url='https://tappyback.ton-runes.top/admin')))
     keyboard.add(  InlineKeyboardButton(text='Играть', web_app= WebAppInfo(url='https://tappybirdfront.vercel.app/'+str(referal_code))))
     await message.answer('Играть в игру', reply_markup=keyboard)
-
-
+   
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)

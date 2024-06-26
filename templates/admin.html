@@ -20,6 +20,7 @@
 <body>
     <section class="section">
         <div class="container">
+            
             <h1 class="title">Admin Panel</h1>
 
             <div class="field">
@@ -33,9 +34,13 @@
                         <input type="radio" name="task_type" value="complex" onclick="toggleTaskType()">
                         Complex Task
                     </label>
+                    <label class="radio">
+                        <input type="radio" name="task_type" value="distribute" onclick="toggleTaskType()">
+                        Distribute Message
+                    </label>
                 </div>
             </div>
-
+            
             <!-- Simple Task Form -->
             <div id="simple-task-form">
                 <form id="task-form" method="post" enctype="multipart/form-data" onsubmit="submitForm(event)">
@@ -147,7 +152,26 @@
                     </div>
                 </form>
             </div>
+            <div id="distribute" style="display: none;">
+                
+                    <div class="field">
+                     
+                    </div>
+                    <div class="field">
+                        <label class="label">Message for distribution</label>
+                        <div class="control">
+                            <textarea class="textarea" id="message-text" placeholder="Message for distribution"></textarea>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button onclick="submitDistributionOfMessage()" class="button is-primary">Send Message</button>
+                        </div>
+                    </div>
+                
 
+
+            </div>
             <!-- Complex Task Form -->
             <div id="complex-task-form" style="display: none;">
                 <div class="field">
@@ -354,14 +378,22 @@
         function toggleTaskType() {
             const simpleTaskForm = document.getElementById('simple-task-form');
             const complexTaskForm = document.getElementById('complex-task-form');
+            const distributeForm = document.getElementById('distribute')
             const taskType = document.querySelector('input[name="task_type"]:checked');
-            
-            if (taskType && taskType.value === 'simple') {
+  
+            if (taskType && taskType.value === 'distribute'){
+                complexTaskForm.style.display = 'none'
+                simpleTaskForm.style.display = 'none'
+                distributeForm.style.display = 'block'
+            }
+            else if (taskType && taskType.value === 'simple') {
                 simpleTaskForm.style.display = 'block';
                 complexTaskForm.style.display = 'none';
+                distributeForm.style.display = 'none'
             } else if (taskType && taskType.value === 'complex') {
                 simpleTaskForm.style.display = 'none';
                 complexTaskForm.style.display = 'block';
+                distributeForm.style.display = 'none'
             }
         }
 
@@ -483,6 +515,34 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error creating task.');
+            });
+        }
+
+        function submitDistributionOfMessage(){
+            const messageText = document.getElementById('message-text').value
+            const data = {
+                sign: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiJ9.B1jT-B1TTgbcAyaOHnClenZzU0f18364UvOYpyKItW8',
+                message: messageText
+            }
+            fetch('/distribute_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'sign': 'valid_token'  // Пример заголовка sign
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.is_ok) {
+                    alert('Tasks created successfully!');
+                } else {
+                    alert('Failed to create tasks.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error creating tasks.');
             });
         }
 

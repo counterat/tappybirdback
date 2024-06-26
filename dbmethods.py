@@ -128,24 +128,47 @@ async def buy_booster(user_id, booster_name):
     except Exception as ex:
         print(ex)
 
+async def ditribute_message_work(message):
+    async with async_session() as session:
+        all_users_query = select(User)
+        result = await session.execute(all_users_query)
+        all_users = result.scalars().all()
+        for user in all_users:
+            send_message_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+
+                                # Параметры запроса
+            params = {
+                                    'chat_id': user.telegram_id,
+                                    'text': message
+                                }
+
+                                # Отправляем POST-запрос к API Telegram для отправки сообщения
+            response = requests.post(send_message_url, json=params)
+            
 async def buy_shop_item(user_id, item_name):
         from cache import buy_shop_item_cache
         async with async_session() as session:
             async with session.begin():
                 user = await find_user_by_id(user_id)
                 shop_item = shop_items[item_name]
-                price = decimal.Decimal(str(shop_item['price']))
-                if user.balance_in_tappycoin >= price:
-                    print(user.to_dict())
-                    update_query = update(User).where(User.id == user_id).values(balance_in_tappycoin = user.balance_in_tappycoin - price )
+                if shop_item.get('price'):
+                    price = decimal.Decimal(str(shop_item['price']))
+                    if user.balance_in_tappycoin >= price:
+                        print(user.to_dict())
+                        update_query = update(User).where(User.id == user_id).values(balance_in_tappycoin = user.balance_in_tappycoin - price )
+                        shop_item_in_db = ShopItem(price = price, item_name=item_name, was_bought_by_user=user_id)
+                        session.add(shop_item_in_db)
+                        await session.execute(update_query)
+                        result = await buy_shop_item_cache(user_id, item_name)
+                        if result == 'no more eggs':
+                            return 'no more eggs'
+                        return result 
+                else:
                     shop_item_in_db = ShopItem(price = price, item_name=item_name, was_bought_by_user=user_id)
                     session.add(shop_item_in_db)
-                    await session.execute(update_query)
                     result = await buy_shop_item_cache(user_id, item_name)
-                    if result == 'no more eggs':
-                        return 'no more eggs'
-                    return result 
-        
+                    return result
+                
 async def update_in_squad(user_id,new_value):
     async with async_session() as session:
             async with session.begin():
@@ -309,7 +332,8 @@ async def add_user(telegram_id, name, username, created_at, invit_code, geo):
 
         password = str(uuid.uuid4())
         user = await find_user_by_invit_code(invit_code)
-
+        from bot import get_photo_url_of_user
+        photo_url = await get_photo_url_of_user(telegram_id)
         if not user:
             new_user = User(
                 telegram_id=telegram_id,
@@ -319,7 +343,8 @@ async def add_user(telegram_id, name, username, created_at, invit_code, geo):
                 password=password,
                 sign=jwt.encode({'id': telegram_id, "password": password}, 'secret_key'),
                 invitation_code=random.randint(100, 2147483647),
-                geo = geo
+                geo = geo,
+                photo_url = photo_url
 
             )
         else:
@@ -332,7 +357,8 @@ async def add_user(telegram_id, name, username, created_at, invit_code, geo):
             sign=jwt.encode({'id':telegram_id, "password":password}, 'secret_key'),
             invitation_code = random.randint(100, 2147483647),
             invited_by = user.id,
-                geo = geo
+                geo = geo,
+                photo_url = photo_url
         )
 
         # Создание асинхронной сессии и добавление пользователя в базу данных

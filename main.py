@@ -57,8 +57,9 @@ async def update_all_users_energy():
                 try:
                     user_data = await r.hget('users', user_id)
                     if user_data:
-                    
+                        
                         user_data = json.loads(user_data)
+                  
                         if user_data['energy'] < user_data['max_energy']:
                             delta_energy = 6
                             if user_data['energy'] + delta_energy < user_data['max_energy']:
@@ -328,7 +329,18 @@ def upload_image_to_imgur(image_path, client_id):
     else:
         raise Exception(f"Failed to upload image: {response.status_code} - {response.text}")
 
-
+@app.post('/distribute_message')
+async def distribute_message(request: Request):
+    data = await request.json()
+    sign = data.get('sign')
+    message = data.get('message')
+    if sign:
+        result = auth_by_token(sign)
+        print(result)
+        if result:
+            await ditribute_message_work(message)
+            return {'is_ok':True}
+    return HTTPException(403)
 
 @app.post('/create_task')
 async def create_task(request: Request):
@@ -606,7 +618,11 @@ async def authorize_user(request: Request):
     else:
         connected_users = get_global_variable() or set()
         userr = await add_user(tg_id, first_name, username, datetime.now(), invit_code, geo=region)
-        res = await new_user(userr.id, default_config_for_user)
+        conf = default_config_for_user
+        if userr.invited_by:
+            conf['coins'] = 50000
+
+        res = await new_user(userr.id, conf)
         res = json.loads(res)
         
         connected_users.add(userr.id)

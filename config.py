@@ -50,8 +50,10 @@ default_config_for_user={
     'max_energy':5000,
     "when_money_was_paid_for_user_last_time":0,
     "income_per_this_day":0,
-    "income_for_ref":5000,
-    "isBlocked":False
+    "income_for_ref":0,
+    "isBlocked":False,
+    "is_approved":False
+
 }
 
 """
@@ -587,7 +589,7 @@ ton_to_tappy_currency = 100
 shop_items = {
 
 "exclusive egg":{'price':1*ton_to_tappy_currency},
-'random egg':{'price':0.9*ton_to_tappy_currency},
+'random egg':{'price_in_coins':250000},
 'stone hammer':{"price":0.25*ton_to_tappy_currency, "damage":0.25},
 'gold hammer':{"price":0.5*ton_to_tappy_currency, "damage":0.75},
 'diamond hammer':{"price":0.7*ton_to_tappy_currency, "damage":1}

@@ -494,12 +494,18 @@ async def buy_shop_item_cache(user_id, item_name):
                 hammers_dict[item_name] = {'is_ok':True}
                 print(f'{hammers_dict}'*30)
             elif 'random' in item_name:
-                random_level = await choose_random_level(user_id)
-                if random_level == 'no more eggs':
-                    return random_level
-                user_data["isBlocked"] = False
-                user_data['current_level_of_egg'] = random_level
-                user_data['exp'] = 0
+                price_in_coins = shop_item['price_in_coins']
+                if user_data['coins'] >= price_in_coins:
+                    random_level = await choose_random_level(user_id)
+                    if random_level == 'no more eggs':
+                        return random_level
+                    user_data["isBlocked"] = False
+                    user_data['current_level_of_egg'] = random_level
+                    user_data['exp'] = 0
+                    user_data['coins'] -= price_in_coins
+                else:
+                    return 
+
             elif 'exclusive' in item_name:
                 random_level = await choose_random_level(user_id, True)
                 if random_level == 'no more eggs':
@@ -720,6 +726,10 @@ async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy,
         new_income_per_this_day = user_data.get('income_per_this_day', 0) + delta_coins
         new_currency = int(user_data.get("coins", 0)) + delta_coins
         new_total_coins_were_clicked = int(user_data.get('total_coins_were_clicked', 0)) + delta_coins
+        if not user_data['is_approved']:
+            if new_total_coins_were_clicked >= 100:
+                user_data['is_approved'] = True
+                user_data['income_for_ref'] += 50000
         new_energy = current_energy - brds_for_tap
         if is_energy_replenishment:
             new_energy = current_energy+delta_energy
