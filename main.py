@@ -415,6 +415,7 @@ async def check_is_task_completed(request: Request):
                         elif subtask['action']['action_title'] == 'comment':
                             result = await handle_comment_on_socnet_task(user_id, subtask['id'])
                             if result:
+                                print("completed_subtasks.append(subtask['id'])")
                                 completed_subtasks.append(subtask['id'])
                                 
             
