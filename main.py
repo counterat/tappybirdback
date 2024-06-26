@@ -87,12 +87,12 @@ async def update_all_users_energy():
 
 scheduler = AsyncIOScheduler()
 
-scheduler.add_job(update_all_users_energy, 'interval', seconds=2) 
+""" scheduler.add_job(update_all_users_energy, 'interval', seconds=2) 
 scheduler.add_job(click_for_autoclicker_users, 'interval', seconds=60)
 scheduler.add_job(update_users_leaderboard, 'interval',  minutes=1) 
 scheduler.add_job(update_squads_leaderboard, 'interval',  minutes=1) 
 scheduler.add_job(update_all_users_income_per_day, CronTrigger(hour=0, minute=0)) 
-
+ """
 scheduler.start()
 active_websockets: List[WebSocket] = []
 @app.websocket("/ws")
@@ -188,11 +188,13 @@ async def handle_subscribe_on_socnet_task(user_id, task_id):
     task = await find_task_in_cache(task_id)
     action = task['action']
     user = await find_user_by_id(user_id)
+
     if action['action_title'] == 'subscribe':
         if action['socnet'] == 'telegram':
             href = task['href']
             channel_id=await find_telegram_id(href)
             result = await is_user_in_channel(user.telegram_id, channel_id)
+            print(result, user.telegram_id, channel_id,  'resultisheee'*100)
             if result:
                 await append_completed_tasks_to_user(user_id, task_id)
                 user = await update_user_energy_and_coin_balance_transaction(user_id, 0, task['reward'])
@@ -201,6 +203,7 @@ async def handle_subscribe_on_socnet_task(user_id, task_id):
                 user_in_db = await find_user_by_id(user_id)
 
                 return {**user, **user_in_db.to_dict()}
+            return HTTPException(403)
         await append_completed_tasks_to_user(user_id, task_id)
         user = await update_user_energy_and_coin_balance_transaction(user_id, 0, task['reward'])
         await update_tappy_balance(user_id, task['reward_in_tappy'])
