@@ -409,21 +409,23 @@ async def check_is_task_completed(request: Request):
                 if task_id not in user['completed_tasks']:
                     if subtask['id'] not in user['completed_tasks']:
                         if subtask['action']['action_title'] == 'subscribe':
-                            result = await handle_subscribe_on_socnet_task(user_id, subtask['id'])
-                            print(completed_subtasks, subtasks, 'mudak'*100)
-                            print(task)
-                            if len(completed_subtasks) == len(subtasks):
-                                    user = await update_user_energy_and_coin_balance_transaction(user_id, 0, task['reward'])
-                                    await update_tappy_balance(user_id, task['reward_in_tappy'])
-                                    result = await append_completed_tasks_to_user(user_id, task_id)
-                                    return result
-                            print(result, 'zholtov'*100)
-                            if result:
-                               
-                                print("completed_subtasks.append(subtask['id'])")
-                                completed_subtasks.append(subtask['id'])
+                            print(subtask_id, task_id, 'AHAHAHAHHAH')
+                            if subtask_id != task_id:
+                                result = await handle_subscribe_on_socnet_task(user_id, subtask['id'])
+                                print(completed_subtasks, subtasks, 'mudak'*100)
+                                print(task)
+                                if len(completed_subtasks) == len(subtasks):
+                                        user = await update_user_energy_and_coin_balance_transaction(user_id, 0, task['reward'])
+                                        await update_tappy_balance(user_id, task['reward_in_tappy'])
+                                        result = await append_completed_tasks_to_user(user_id, task_id)
+                                        return result
+                                print(result, 'zholtov'*100)
+                                if result:
                                 
-                            
+                                    print("completed_subtasks.append(subtask['id'])")
+                                    completed_subtasks.append(subtask['id'])
+                                    
+                                
                         elif subtask['action']['action_title'] == 'comment':
                             result = await handle_comment_on_socnet_task(user_id, subtask['id'])
                             print(completed_subtasks, subtasks, 'mudak'*100)
