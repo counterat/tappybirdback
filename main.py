@@ -434,9 +434,10 @@ async def check_is_task_completed(request: Request):
             print(task)
             if len(completed_subtasks) == len(subtasks):
                     user = await update_user_energy_and_coin_balance_transaction(user_id, 0, task['reward'])
-                    await update_tappy_balance(user_id, task['reward_in_tappy'])
+                    user_in_db = await update_tappy_balance(user_id, task['reward_in_tappy'])
                     result = await append_completed_tasks_to_user(user_id, task_id)
-                    return result            
+                
+                    return {**result, **user_in_db.to_dict()  }            
                                 
         elif action:
             print(task['id'] not in user['completed_tasks'])
