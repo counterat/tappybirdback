@@ -62,7 +62,7 @@ async def update_all_users_energy():
                   
                         if user_data['energy'] < user_data['max_energy']:
                             delta_energy = 0
-
+                            user = await find_user_by_id(int(user_id))
                             if user_data['energy'] + delta_energy > user_data['max_energy']:
                                 delta_energy = user_data['max_energy'] - user_data['energy']
                                 res = await update_user_energy_and_coin_balance_transaction(int(user_id), delta_energy, 0, True, user.telegram_id)
@@ -72,7 +72,7 @@ async def update_all_users_energy():
                                 res = await update_user_energy_and_coin_balance_transaction(int(user_id), delta_energy, 0, True, user.telegram_id)
                             
                             print(res['energy'], 'ahah'*100)
-                            user = await find_user_by_id(int(user_id))
+                            
                             print(res, 'res')
                             res['id'] = int(user_id)
                             await broadcast_message(json.dumps({"eventname": "energy_replenishment", **res}))
