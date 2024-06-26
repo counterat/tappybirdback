@@ -582,7 +582,7 @@ async def buy_booster_cache(user_id, price, times_booster_was_bought_by_user, bo
                     user_data['max_energy'] += 500
                     
                 if booster_name =='tap bot':
-                    await add_tap_bot(user_id,{"time_worked" :0, "time_remained_to_work":60} )
+                    await add_tap_bot(user_id,{"time_worked" :0, "time_remained_to_work":12*60*60} )
                    
 
                 await pipe.hset(f'users',f'{user_id}', json.dumps({
