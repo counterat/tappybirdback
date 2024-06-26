@@ -105,7 +105,7 @@ async def update_tappy_balance(user_id, delta_value):
         update_query = update(User).where(User.id == user_id).values(balance_in_tappycoin= user.balance_in_tappycoin + decimal.Decimal(str(delta_value)))
         async with session.begin():
             await session.execute(update_query)
-        user = find_user_by_id(user_id)
+        user = await find_user_by_id(user_id)
         return user
 async def buy_booster(user_id, booster_name):
     from cache import buy_booster_cache
