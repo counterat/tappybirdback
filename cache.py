@@ -282,6 +282,7 @@ async def mine_brd(user_id, is_autoclicker=False):
             if hammer:
                 result = await setNoneHammer_and_update(user_id, hammer, brds_for_tap)
             else:
+                print('tinkov'*40, brds_for_tap, -1*brds_for_tap)
                 result = await update_user_energy_and_coin_balance_transaction(user_id, -1 * brds_for_tap, brds_for_tap)
 
         # Проверяем, достиг ли пользователь максимального уровня яйца после обновления
