@@ -61,9 +61,11 @@ async def update_all_users_energy():
                         user_data = json.loads(user_data)
                   
                         if user_data['energy'] < user_data['max_energy']:
-                            delta_energy = 6
+                            delta_energy = 0
                             if user_data['energy'] + delta_energy < user_data['max_energy']:
                                 delta_energy = user_data['max_energy'] - user_data['energy']
+                            else:
+                                delta_energy = 6
                             user = await find_user_by_id(int(user_id))
                             res = await update_user_energy_and_coin_balance_transaction(int(user_id), delta_energy, 0, True, user.telegram_id)
                             print(res, 'res')
