@@ -405,7 +405,7 @@ async def check_is_task_completed(request: Request):
             print('huyatina', task)
             completed_subtasks = []
             for subtask_id in subtasks:
-                subtask = await find_task_in_cache(task_id)
+                subtask = await find_task_in_cache(subtask_id)
                 if task_id not in user['completed_tasks']:
                     if subtask['id'] not in user['completed_tasks']:
                         if subtask['action']['action_title'] == 'subscribe':
