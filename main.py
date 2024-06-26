@@ -265,8 +265,9 @@ async def handler_creating_task_for_only_one_task(data):
 
                         if socnet in socnets_available:
                             if socnet == 'telegram':
-                                chat_id = await get_chat_id(href)
-                                await new_telegram_id(href, chat_id)
+                                if not subtasks:
+                                    chat_id = await get_chat_id(href)
+                                    await new_telegram_id(href, chat_id)
                             last_task = await get_last_task()
                             banner_image = data.get('banner_image')
                             if banner_image:
