@@ -267,14 +267,14 @@ async def mine_brd(user_id, is_autoclicker=False):
 
         # Вычисляем количество ударов (brds_for_tap)
         brds_for_tap = 1 + value_dict['boosters'].get('multitap', {}).get('buff_level', 0)
-        print('brds_for_tap'*40, brds_for_tap, -1*brds_for_tap)
+        
         hammer, damage = await get_hammer(value_dict)
-
+        print('brds_for_tap'*40, brds_for_tap, -1*brds_for_tap, hammer, damage)
         # Если есть молоток, вычисляем минимальное количество ударов
         if hammer:
             egg = eggs[value_dict['current_level_of_egg']]
             remained_hps_for_egg = egg['hp'] - value_dict['exp']
-            brds_for_tap = min(brds_for_tap, damage * egg['hp'], remained_hps_for_egg)
+            brds_for_tap = min(damage * egg['hp'], remained_hps_for_egg)
             print('hammer'*40, brds_for_tap, -1*brds_for_tap)
         # Обновляем баланс энергии и монет пользователя
         if is_autoclicker:
