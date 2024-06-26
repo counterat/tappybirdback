@@ -193,6 +193,7 @@ async def handle_subscribe_on_socnet_task(user_id, task_id):
     if action['action_title'] == 'subscribe':
         if action['socnet'] == 'telegram':
             href = task['href']
+            print(href, 'href'*100)
             channel_id=await find_telegram_id(href)
             result = await is_user_in_channel(user.telegram_id, channel_id)
             print(result, user.telegram_id, channel_id,  'resultisheee'*100)
