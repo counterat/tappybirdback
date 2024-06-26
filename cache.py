@@ -722,8 +722,9 @@ async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy,
 
         # Вычисляем новое значение для energy и проверяем условие
         current_energy = int(user_data.get("energy", 0))
-        if delta_energy > current_energy:
-            raise ValueError("Not enough energy")
+        if delta_energy < 0:
+            if delta_energy < 0-current_energy:
+                raise ValueError("Not enough energy")
 
         # Вычисляем brds_for_tap и обновляем данные пользователя
         brds_for_tap = delta_coins
