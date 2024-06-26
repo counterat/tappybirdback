@@ -410,7 +410,7 @@ async def check_is_task_completed(request: Request):
                     if subtask['id'] not in user['completed_tasks']:
                         if subtask['action']['action_title'] == 'subscribe':
                             print(subtask, task_id, 'AHAHAHAHHAH'*100)
-                            if subtask_id != task_id:
+                            if subtask['id'] != task_id:
                                 result = await handle_subscribe_on_socnet_task(user_id, subtask['id'])
                                 print(completed_subtasks, subtasks, 'mudak'*100)
                                 print(task)
