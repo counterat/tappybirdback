@@ -419,7 +419,7 @@ async def check_is_task_completed(request: Request):
                                 print("completed_subtasks.append(subtask['id'])")
                                 completed_subtasks.append(subtask['id'])
                                 
-            print(completed_subtasks, subtasks, ' print(completed_subtasks, subtasks,')
+            print(completed_subtasks, subtasks, '!!!'*100)
             print(task)
             if len(completed_subtasks) == len(subtasks):
                 user = await update_user_energy_and_coin_balance_transaction(user_id, 0, task['reward'])
