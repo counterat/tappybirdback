@@ -231,7 +231,8 @@ async def get_hammer(value_dict):
     hammers_dict = value_dict.get('hammers', {})
     for hammer in ['diamond hammer', 'gold hammer', 'stone hammer']:
         if hammer in hammers_dict:
-            return hammer, shop_items[hammer]['damage']
+            if len(hammers_dict[hammer]) > 0:
+                return hammer, shop_items[hammer]['damage']
     return None, 0        
 async def handle_new_bird(user_id, result, bird_id):
     bird = BIRDLIST[bird_id - 1]
