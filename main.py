@@ -656,6 +656,7 @@ async def authorize_user(request: Request):
         conf = default_config_for_user
         if userr.invited_by:
             conf['coins'] = 50000
+            conf['income_for_ref'] = 50000
 
         res = await new_user(userr.id, conf)
         res = json.loads(res)
