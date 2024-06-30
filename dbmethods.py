@@ -168,6 +168,7 @@ async def buy_shop_item(user_id, item_name):
                             return 'no more eggs'
                         return result 
                 else:
+                    price = shop_item.get('price_in_coins')
                     shop_item_in_db = ShopItem(price = price, item_name=item_name, was_bought_by_user=user_id)
                     session.add(shop_item_in_db)
                     result = await buy_shop_item_cache(user_id, item_name)
