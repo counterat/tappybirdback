@@ -15,6 +15,31 @@
             color: #00d1b2;
             margin-bottom: 15px;
         }
+        .task-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.task-table th, .task-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.task-table th {
+    background-color: #f2f2f2;
+}
+
+.task-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.task-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
     </style>
 </head>
 <body>
@@ -37,6 +62,10 @@
                     <label class="radio">
                         <input type="radio" name="task_type" value="distribute" onclick="toggleTaskType()">
                         Distribute Message
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="task_type" value="tasks" onclick="toggleTaskType()">
+                        Tasks
                     </label>
                 </div>
             </div>
@@ -171,6 +200,10 @@
                 
 
 
+            </div>
+            <div id="tasks"  style="display: none;">
+                <h1 class="title">Task List</h1>
+                <div id="task-list"></div>
             </div>
             <!-- Complex Task Form -->
             <div id="complex-task-form" style="display: none;">
@@ -380,21 +413,31 @@
             const complexTaskForm = document.getElementById('complex-task-form');
             const distributeForm = document.getElementById('distribute')
             const taskType = document.querySelector('input[name="task_type"]:checked');
-  
-            if (taskType && taskType.value === 'distribute'){
-                complexTaskForm.style.display = 'none'
-                simpleTaskForm.style.display = 'none'
-                distributeForm.style.display = 'block'
-            }
-            else if (taskType && taskType.value === 'simple') {
-                simpleTaskForm.style.display = 'block';
-                complexTaskForm.style.display = 'none';
-                distributeForm.style.display = 'none'
-            } else if (taskType && taskType.value === 'complex') {
-                simpleTaskForm.style.display = 'none';
-                complexTaskForm.style.display = 'block';
-                distributeForm.style.display = 'none'
-            }
+            const tasksDiv = document.getElementById('tasks');
+         
+            if (taskType && taskType.value === 'distribute') {
+            complexTaskForm.style.display = 'none';
+            simpleTaskForm.style.display = 'none';
+            distributeForm.style.display = 'block';
+            tasksDiv.style.display = 'none';
+        } else if (taskType && taskType.value === 'simple') {
+            simpleTaskForm.style.display = 'block';
+            complexTaskForm.style.display = 'none';
+            distributeForm.style.display = 'none';
+            tasksDiv.style.display = 'none';
+        } else if (taskType && taskType.value === 'complex') {
+            simpleTaskForm.style.display = 'none';
+            complexTaskForm.style.display = 'block';
+            distributeForm.style.display = 'none';
+            tasksDiv.style.display = 'none';
+        } else if (taskType && taskType.value === 'tasks') {
+            
+            simpleTaskForm.style.display = 'none';
+            complexTaskForm.style.display = 'none';
+            distributeForm.style.display = 'none';
+            tasksDiv.style.display = 'block';
+            fetchTasks(); // Fetch and display tasks when "Tasks" is selected
+        }
         }
 
         function generateSubtaskForms() {
@@ -517,6 +560,142 @@
                 alert('Error creating task.');
             });
         }
+        document.addEventListener('DOMContentLoaded', function() {
+    // Function to fetch tasks from the server
+    function fetchTasks() {
+        fetch('/fetch_all_tasks')
+            .then(response => response.json())
+            .then(data => {
+                renderTasks(data);
+            })
+            .catch(error => {
+                console.error('Error fetching tasks:', error);
+            });
+    }
+
+    // Function to render tasks in the task list
+    function renderTasks(tasks) {
+    const taskContainer = document.getElementById('task-list');
+    taskContainer.innerHTML = ''; // Очищаем контейнер перед добавлением новых задач
+
+    // Создаем таблицу и добавляем класс для стилизации
+    const table = document.createElement('table');
+    table.className = 'task-table';
+
+    // Создаем заголовок таблицы
+    const tableHeader = `
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Link to Banner</th>
+                <th>Reward</th>
+                <th>Reward in Tappi</th>
+                <th>Action Title</th>
+                <th>Social Network</th>
+                <th>Banner Title</th>
+                <th>Banner Description</th>
+            </tr>
+        </thead>
+    `;
+    table.innerHTML = tableHeader;
+
+    // Создаем тело таблицы
+    const tableBody = document.createElement('tbody');
+
+    // Добавляем каждую задачу в таблицу
+    tasks.forEach(task => {
+        task = JSON.parse(task);
+
+        const tableRow = document.createElement('tr');
+
+        const taskId = document.createElement('td');
+        taskId.textContent = task.id;
+        tableRow.appendChild(taskId);
+
+        const taskTitle = document.createElement('td');
+        taskTitle.textContent = task.title;
+        tableRow.appendChild(taskTitle);
+
+        const taskDescription = document.createElement('td');
+        taskDescription.textContent = task.description;
+        tableRow.appendChild(taskDescription);
+
+        const linkToBanner = document.createElement('td');
+        linkToBanner.textContent = task.link_to_banner;
+        tableRow.appendChild(linkToBanner);
+
+        const reward = document.createElement('td');
+        reward.textContent = task.reward;
+        tableRow.appendChild(reward);
+        console.log(task)
+        const rewardInTappi = document.createElement('td');
+        rewardInTappi.textContent = task.reward_in_tappy;
+        tableRow.appendChild(rewardInTappi);
+
+        const actionTitle = document.createElement('td');
+ 
+        actionTitle.textContent = task.action.action_title;
+        tableRow.appendChild(actionTitle);
+
+        const socialNetwork = document.createElement('td');
+        socialNetwork.textContent = task.action.socnet;
+        tableRow.appendChild(socialNetwork);
+
+        const bannerTitle = document.createElement('td');
+        bannerTitle.textContent = task.bannerTitle;
+        tableRow.appendChild(bannerTitle);
+
+        const bannerDescription = document.createElement('td');
+        bannerDescription.textContent = task.bannerDescription;
+        tableRow.appendChild(bannerDescription);
+
+
+        const deleteButtonCell = document.createElement('td');
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.className = 'btn btn-danger btn-sm';
+        deleteButton.addEventListener('click', () => {
+            deleteTask(task.id); // Вызываем функцию удаления задачи по ID
+        });
+        deleteButtonCell.appendChild(deleteButton);
+        tableRow.appendChild(deleteButtonCell);
+
+        tableBody.appendChild(tableRow);
+    });
+    
+    table.appendChild(tableBody);
+    taskContainer.appendChild(table);
+}
+
+
+    // Function to delete a task from the server
+    function deleteTask(taskId) {
+        let data = {
+            taskId:taskId,
+            login:admin,
+            password:admin
+        }
+        fetch(`/delete_task`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                fetchTasks(); // Refresh the task list after deletion
+            } else {
+                console.error('Error deleting task');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    // Initial fetch of tasks
+    fetchTasks();
+});
 
         function submitDistributionOfMessage(){
             const messageText = document.getElementById('message-text').value

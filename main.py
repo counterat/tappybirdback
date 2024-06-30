@@ -35,8 +35,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 @app.get("/admin", response_class=HTMLResponse)
-async def get_admin_page(request: Request):
-    return templates.TemplateResponse("admin.html", {"request": request, "title": "Admin Panel"})
+async def get_admin_page(request: Request, login: str = None, password: str = None):
+    if auth_by_login_and_password(login, password):
+        return templates.TemplateResponse("admin.html", {"request": request, "title": "Admin Panel"})
+    return HTTPException(403)
 
 app.add_middleware(
     CORSMiddleware,
@@ -171,6 +173,22 @@ async def buy_shop_item_handler(request:Request):
     except Exception as ex:
         print(ex)
         return HTTPException(403)
+
+@app.get('/fetch_all_tasks')
+async def fetch_all_tasks_handler():
+    tasks = await fetch_all_tasks()
+    return tasks
+
+@app.post('/delete_task')
+async def delete_task(request: Request):
+    data = await request.json()
+    login = data['login']
+    password = data['password']
+    if auth_by_login_and_password(login, password):
+        taskId = data['taskId']
+        fetched_tasks = await delete_task(taskId)
+        return fetched_tasks
+    return HTTPException(403)
 
 @app.post('/fetch_tasks_for_geo')
 async def fetch_tasks_for_geo(request:Request):

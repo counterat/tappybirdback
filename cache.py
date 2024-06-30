@@ -52,6 +52,15 @@ async def find_task_in_region_in_cache(geo):
     tasks_data = json.loads(tasks_data)
     return tasks_data
 
+async def fetch_all_tasks():
+    tasks_data = await r.hvals('all_tasks')
+    return tasks_data
+
+async def delete_task(taskId):
+    await r.hdel('all_tasks', taskId )
+    fetched_tasks = await fetch_all_tasks()
+    return fetched_tasks
+
 async def new_task(key,value):
     # Сериализация значения в JSON формат
     value_json = json.dumps(value)

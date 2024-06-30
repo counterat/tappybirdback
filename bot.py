@@ -11,6 +11,7 @@ logging.basicConfig(level=logging.INFO)
 # Создаем объект бота и диспетчера
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
+admin_ids = [415275008, 284539277, 616305943, 881704893]
 
 def extract_username(link):
     # Регулярное выражение для извлечения имени пользователя из ссылки
@@ -67,7 +68,8 @@ async def handler(message:types.Message):
     if  not referal_code:
         referal_code = ''
     keyboard = InlineKeyboardMarkup()
-    keyboard.add(InlineKeyboardButton(text='Админка', web_app=WebAppInfo(url='https://tappyback.ton-runes.top/admin')))
+    if message.from_user.id in admin_ids:
+        keyboard.add(InlineKeyboardButton(text='Админка', web_app=WebAppInfo(url='https://tappyback.ton-runes.top/admin?login=admin&password=admin')))
     keyboard.add(  InlineKeyboardButton(text='Играть', web_app= WebAppInfo(url='https://tappybirdfront.vercel.app/'+str(referal_code))))
     await message.answer('Играть в игру', reply_markup=keyboard)
    
