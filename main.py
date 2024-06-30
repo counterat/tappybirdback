@@ -614,7 +614,7 @@ async def authorize_user(request: Request):
         region = 'EUROPE'
     
     if isTest:
-        tg_id = 6874159282
+        tg_id = 881704893
         first_name = 'leps'
         username = 'leps'
         invit_code = 150004449
