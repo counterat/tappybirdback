@@ -637,7 +637,7 @@ async def buy_booster_handler(request:Request):
             return result
     return HTTPException(403)
 
-isTest = True
+isTest = False
 @app.get('/tonconnect-manifest.json')
 async def return_tonconnect_manifest(request:Request):
     return  {
