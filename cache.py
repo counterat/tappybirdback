@@ -9,8 +9,16 @@ from globalstate import global_state, get_global_variable, set_global_variable, 
 loop = asyncio.get_event_loop()
 
 """ {"user_id":{"time_worked" :0, "time_remained_to_work":12*60*60}} """
-r = aioredis.from_url("redis://tappycoin-iz9eh5.serverless.eun1.cache.amazonaws.com:6379", password="XGaaNySprD3", decode_responses=True)
+r = aioredis.from_url(
+        "redis://master.tappycache.iz9eh5.eun1.cache.amazonaws.com:6379",
+        password="RgYHwPSf1JC8cmh5",
+        decode_responses=True
+    )
 
+async def main():
+    res = await r.hset('users', 1, '{}')
+    print(res)
+asyncio.run(main())
 async def get_last_task():
     keys = await r.hkeys("all_tasks")
     print(keys)
