@@ -786,7 +786,7 @@ async def get_random_egg(user_id):
         except Exception as e:
             await pipe.reset()
             raise e
-async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy, delta_coins, is_energy_replenishment=False, telegram_id=''):
+async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy, delta_coins, is_energy_replenishment=False, telegram_id='', isref=False):
     try:
         print('\n'*5, delta_energy,delta_coins ,'\n'*5)
         # Получаем текущие данные пользователя
@@ -814,8 +814,10 @@ async def update_user_energy_and_coin_balance_transaction(user_id, delta_energy,
         new_energy = current_energy + delta_energy
         if is_energy_replenishment:
             new_energy = current_energy+delta_energy
-        new_exp = int(user_data.get("exp", 0)) + delta_coins
-
+        if not isref:
+            new_exp = int(user_data.get("exp", 0)) + delta_coins
+        else:
+            new_exp = int(user_data.get("exp", 0)) 
         # Обновляем данные в Redis
         await r.hset('users', user_id, json.dumps({
             **user_data,
