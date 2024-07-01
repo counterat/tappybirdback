@@ -3,7 +3,7 @@ import aiohttp
 import time
 
 async def fetch_coins(session, user_id):
-    url = f'https://api.tappybird.top/minecoin'
+    url = f'https://api.tappybrd.com/minecoin'
     data = {"userId": user_id}
     async with session.post(url, json=data) as response:
         result = await response.json()

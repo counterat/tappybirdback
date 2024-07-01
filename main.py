@@ -641,7 +641,7 @@ isTest = False
 @app.get('/tonconnect-manifest.json')
 async def return_tonconnect_manifest(request:Request):
     return  {
-    "url": "https://api.tappybird.top",                        
+    "url": "https://api.tappybrd.com",                        
     "name": "tappybird",                     
       "iconUrl": "https://ton-connect.github.io/demo-dapp-with-react-ui/apple-touch-icon.png",
   "termsOfUseUrl": "https://ton-connect.github.io/demo-dapp-with-react-ui/terms-of-use.txt",

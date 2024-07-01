@@ -88,7 +88,7 @@ async def handler(message:types.Message):
         referal_code = ''
     keyboard = InlineKeyboardMarkup()
     if message.from_user.id in admin_ids:
-        keyboard.add(InlineKeyboardButton(text='Admin panel', web_app=WebAppInfo(url='https://api.tappybird.top/admin?login=admin&password=admin')))
+        keyboard.add(InlineKeyboardButton(text='Admin panel', web_app=WebAppInfo(url='https://api.tappybrd.com/admin?login=admin&password=admin')))
     keyboard.add(  InlineKeyboardButton(text='Play', web_app= WebAppInfo(url='https://tappybirdfront.vercel.app/'+str(referal_code))))
     await message.answer('''
 Welcome to Tappy Bird!
