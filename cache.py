@@ -9,7 +9,7 @@ from globalstate import global_state, get_global_variable, set_global_variable, 
 loop = asyncio.get_event_loop()
 
 """ {"user_id":{"time_worked" :0, "time_remained_to_work":12*60*60}} """
-r = aioredis.from_url("redis://16.170.242.255:6379", password="XGaaNySprD3", decode_responses=True)
+r = aioredis.from_url("redis://tappycoin-iz9eh5.serverless.eun1.cache.amazonaws.com:6379", password="XGaaNySprD3", decode_responses=True)
 
 async def get_last_task():
     keys = await r.hkeys("all_tasks")
@@ -146,6 +146,49 @@ async def click_for_autoclicker_users():
                         await update_tap_bot(int(user_id), time_for_expiring_autoclickers)
                     print(f'{connected_users}autoimm{user_id}{int(user_id) in connected_users}'*10)
 
+async def msg_to_autoclickers():
+    users = await r.hkeys('users')
+    for user_id in users:
+        try:
+            if user_id !='':
+                
+                value_json = await r.hget('users', int(user_id))
+                value_dict = json.loads(value_json)
+                print(value_dict)
+                boosters_dict = value_dict.get('boosters')
+                if boosters_dict['tap bot'] !={}:
+                    time_for_expiring_autoclickers = await find_tap_bot_in_cache(int(user_id))
+                    print(time_for_expiring_autoclickers, 'time_for_expiring_autoclickers')
+                    if time_for_expiring_autoclickers['time_remained_to_work'] <= 0:
+                        user = await find_user_by_id(int(user_id))
+                        web_app_url = 'https://tappybirdfront.vercel.app/'
+                        inline_keyboard_button = {
+        "text": "Play",
+        "web_app": {
+            "url": web_app_url
+        }
+    }
+                        reply_markup = {
+        "inline_keyboard": [[inline_keyboard_button]]
+    }
+
+                        message = f'''
+    Don't forget to pick up the coins that the autoclicker earned for you! 
+        '''
+                                        # Параметры запроса
+                    send_message_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+
+                                                        # Параметры запроса
+                    params = {
+                                                            'chat_id': user.telegram_id,
+                                                            'text': message,
+                                                            'reply_markup': reply_markup
+                                                        }
+
+                                        # Отправляем POST-запрос к API Telegram для отправки сообщения
+                    response = requests.post(send_message_url, json=params)
+        except:
+            ''
 async def update_all_users_income_per_day():
     user_ids = await r.hkeys('users')
     for user_id in user_ids:
