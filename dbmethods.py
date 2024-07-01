@@ -400,7 +400,7 @@ you have been invited by {username}
     '''
                                     # Параметры запроса
                 params = {
-                                        'chat_id': user.telegram_id,
+                                        'chat_id': new_user.telegram_id,
                                         'text': message
                                     }
 
@@ -415,20 +415,7 @@ async def add_to_invited_users(session, user_id, new_value):
     async with async_session() as session:
         async with session.begin():
             user = await find_user_by_id(user_id)
-            message_text = f'По вашей ссылке перешел новый человек с айди {new_value}!'
-
-                                # Формируем URL для отправки сообщения
-            send_message_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
-
-                                # Параметры запроса
-            params = {
-                                    'chat_id': user.telegram_id,
-                                    'text': message_text
-                                }
-
-                                # Отправляем POST-запрос к API Telegram для отправки сообщения
-            response = requests.post(send_message_url, json=params)
-            
+           
             array = user.invited_users
             array.append(new_value)
             await session.execute(
