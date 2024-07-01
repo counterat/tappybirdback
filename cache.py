@@ -354,8 +354,8 @@ async def mine_brd(user_id, is_autoclicker=False):
             print('hammer'*40, brds_for_tap, -1*brds_for_tap)
         # Обновляем баланс энергии и монет пользователя
         if is_autoclicker:
-            brds_for_tap = min(brds_for_tap, 3) 
-            result = await update_user_energy_and_coin_balance_transaction(user_id, -60 * brds_for_tap, 60 * brds_for_tap)
+            brds_for_tap = min(60 * brds_for_tap, 90) 
+            result = await update_user_energy_and_coin_balance_transaction(user_id, -brds_for_tap, brds_for_tap)
         else:
             if hammer:
                 result = await setNoneHammer_and_update(user_id, hammer, brds_for_tap)

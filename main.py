@@ -115,7 +115,7 @@ Energy recharged! ⚡️Time to collect $BRD and Birds
 
 scheduler = AsyncIOScheduler()
 scheduler.add_job(click_for_autoclicker_users, 'interval', seconds=60)
-scheduler.add_job(update_all_users_energy, 'interval', seconds=2) 
+scheduler.add_job(update_all_users_energy, 'interval', seconds=4) 
 scheduler.add_job(msg_to_autoclickers, 'interval', hours=6)
 scheduler.add_job(update_users_leaderboard, 'interval',  minutes=1) 
 scheduler.add_job(update_squads_leaderboard, 'interval',  minutes=1)  
