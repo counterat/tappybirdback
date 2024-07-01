@@ -2,13 +2,13 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 import logging
 from config import *
-BOT_TOKEN = '6986907470:AAFGGwdxSoYAPbOA14qi5kPKwG4uFYltD4k'
+
 import re
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 
 # Создаем объект бота и диспетчера
-bot = Bot(token=BOT_TOKEN)
+bot = Bot(token=bot_token)
 dp = Dispatcher(bot)
 admin_ids = [415275008, 284539277, 616305943, 881704893]
 
