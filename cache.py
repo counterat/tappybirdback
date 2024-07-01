@@ -15,12 +15,20 @@ async def get_last_task():
     keys = await r.hkeys("all_tasks")
     print(keys)
     # Нахождение последнего ключа по времени
-    latest_key = max(keys, key=int)
+   
+    try: 
+        latest_key = max(keys, key=int)
+    except Exception as ex:
+        latest_key = 0
     print(latest_key)
-    latest_value = await r.hget('all_tasks', latest_key)
-    print(latest_value, type(latest_value))
-    elements = await r.hgetall('all_tasks')
-    return json.loads(latest_value)
+    try:
+        latest_value = await r.hget('all_tasks', latest_key)
+        print(latest_value, type(latest_value))
+        elements = await r.hgetall('all_tasks')
+    
+        return json.loads(latest_value)
+    except:
+        return {'id':0}
 """ asyncio.run(get_last_task()) """
 """ r.set('key', 'value') """
 
@@ -50,7 +58,12 @@ async def find_task_in_cache(task_id):
 async def find_task_in_region_in_cache(geo):
     tasks_data = await r.hget('tasks', geo)
     tasks_data = json.loads(tasks_data)
-    return tasks_data
+    tasks_to_send = []
+    for task_id in tasks_data:
+        task_to_send = await find_task_in_cache(task_id)
+        if task_to_send:
+            tasks_to_send.append(task_to_send)
+    return tasks_to_send
 
 async def fetch_all_tasks():
     tasks_data = await r.hvals('all_tasks')
@@ -172,6 +185,8 @@ async def update_income_per_day(key):
                 income_for_ref += round(user_data['income_per_this_day'] * 0.1)
            
             user_data['income_per_this_day'] = 0
+            user_data["income_for_ref"] = income_for_ref
+            print(user_data, 'user_data')
             await pipe.hset(f'users',f'{key}', json.dumps({
                 **user_data,
             }))

@@ -71,7 +71,32 @@ async def update_all_users_energy():
                                 delta_energy = user_data['max_energy'] - user_data['energy']
                                 print(delta_energy, 'kros'*100)
                                 res = await update_user_energy_and_coin_balance_transaction(int(user_id), delta_energy, 0, True, user.telegram_id)
-                            
+                                web_app_url = 'https://tappybirdfront.vercel.app/'
+                                inline_keyboard_button = {
+    "text": "Open WebApp",
+    "web_app": {
+        "url": web_app_url
+    }
+}
+                                message_text = f'''
+Energy recharged! ⚡️Time to collect $BRD and Birds
+'''     
+                                reply_markup = {
+    "inline_keyboard": [[inline_keyboard_button]]
+}
+
+                                # Формируем URL для отправки сообщения
+                                send_message_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+
+                                                    # Параметры запроса
+                                params = {
+                                                        'chat_id': user.telegram_id,
+                                                        'text': message_text,
+                                                        'reply_markup': reply_markup
+                                                    }
+
+                                                    # Отправляем POST-запрос к API Telegram для отправки сообщения
+                                response = requests.post(send_message_url, json=params)
                             else:
                                 print('pidor'*100)
                                 delta_energy = 6
@@ -89,12 +114,13 @@ async def update_all_users_energy():
 
 
 scheduler = AsyncIOScheduler()
-scheduler.add_job(click_for_autoclicker_users, 'interval', seconds=60)
+""" scheduler.add_job(click_for_autoclicker_users, 'interval', seconds=60)
 scheduler.add_job(update_all_users_energy, 'interval', seconds=2) 
 
 scheduler.add_job(update_users_leaderboard, 'interval',  minutes=1) 
-scheduler.add_job(update_squads_leaderboard, 'interval',  minutes=1) 
-scheduler.add_job(update_all_users_income_per_day, CronTrigger(hour=0, minute=0)) 
+scheduler.add_job(update_squads_leaderboard, 'interval',  minutes=1)  """
+scheduler.add_job(update_all_users_income_per_day, CronTrigger(hour=0, minute=0) )
+CronTrigger(hour=0, minute=0) 
 """ 
  """
 scheduler.start()
@@ -180,7 +206,8 @@ async def fetch_all_tasks_handler():
     return tasks
 
 @app.post('/delete_task')
-async def delete_task(request: Request):
+async def delete_task_handler(request:Request):
+    print(request)
     data = await request.json()
     login = data['login']
     password = data['password']

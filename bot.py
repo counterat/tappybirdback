@@ -1,6 +1,5 @@
 from aiogram import Bot, Dispatcher, types 
 from aiogram.utils import executor
-
 import logging
 from config import *
 BOT_TOKEN = '6986907470:AAFGGwdxSoYAPbOA14qi5kPKwG4uFYltD4k'
@@ -59,6 +58,26 @@ async def get_photo_url_of_user(user_id):
         return file_url
     except:
         return 'https://telegra.ph/file/99e7fb4ff14703f8d0d7f.png'
+    
+@dp.message_handler(commands=['ref_link'])
+async def get_users_ref_link_handler(message: types.Message):
+    from dbmethods import find_user_by_telegram_id
+    user = await find_user_by_telegram_id(message.from_user.id)
+    if user:
+        message_text = f'''
+    Invite friends and get 50k $BRD + 10% from income of each friend
+    {official_channel_link + f'?start={user.invitation_code}'}
+    '''
+        
+        await message.answer(message_text)
+
+@dp.message_handler(commands=['social'])
+async def social_networks_handler(message: types.Message):
+    kb = types.InlineKeyboardMarkup()
+    kb.add(types.InlineKeyboardButton('Discord', url='discord.com'))
+    kb.add(types.InlineKeyboardButton('Twitter', url='https://x.com/tappybirdd?s=21'))
+    kb.add(types.InlineKeyboardButton('Telegram', url='https://t.me/tappy_bird'))
+    await message.answer('Join our community!', reply_markup=kb)
 
 @dp.message_handler()
 async def handler(message:types.Message):
@@ -71,7 +90,12 @@ async def handler(message:types.Message):
     if message.from_user.id in admin_ids:
         keyboard.add(InlineKeyboardButton(text='Админка', web_app=WebAppInfo(url='https://tappyback.ton-runes.top/admin?login=admin&password=admin')))
     keyboard.add(  InlineKeyboardButton(text='Играть', web_app= WebAppInfo(url='https://tappybirdfront.vercel.app/'+str(referal_code))))
-    await message.answer('Играть в игру', reply_markup=keyboard)
+    await message.answer('''
+Welcome to Tappy Bird!
+we are a new project on ton blockchain .
+Hurry up and go to the app to break all the eggs and get unique birds and $BRD tokens!🐣
+Complete tasks and invite friends to get extra rewards ✅
+''', reply_markup=keyboard)
    
 
 if __name__ == '__main__':

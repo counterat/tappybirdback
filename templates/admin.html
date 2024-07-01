@@ -672,26 +672,32 @@
 
     // Function to delete a task from the server
     function deleteTask(taskId) {
-        let data = {
-            taskId:taskId,
-            login:admin,
-            password:admin
+    const data = {
+        taskId: taskId,
+        login: "admin",
+        password: "admin"
+    };
+
+    fetch('/delete_task', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'sign': 'valid_token'  // Пример заголовка sign
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (response.ok) {
+            fetchTasks(); // Обновляем список задач после удаления
+        } else {
+            console.error('Ошибка при удалении задачи');
         }
-        fetch(`/delete_task`, {
-            method: 'POST',
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            if (response.ok) {
-                fetchTasks(); // Refresh the task list after deletion
-            } else {
-                console.error('Error deleting task');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+    });
+}
+
 
     // Initial fetch of tasks
     fetchTasks();

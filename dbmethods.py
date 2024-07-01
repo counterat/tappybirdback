@@ -365,7 +365,23 @@ async def add_user(telegram_id, name, username, created_at, invit_code, geo):
                 geo = geo,
                 photo_url = photo_url
         )
+            send_message_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+            if not username:
+                username = 'your friend'
+            else:
+                username = f'@{username}'
+            message = f'''
+Congratulations !
+you have received 50k $BRD + 10% of {username}'s income for participating in the referral program !
+ '''
+                                # Параметры запроса
+            params = {
+                                    'chat_id': user.telegram_id,
+                                    'text': message
+                                }
 
+                                # Отправляем POST-запрос к API Telegram для отправки сообщения
+            response = requests.post(send_message_url, json=params)
         # Создание асинхронной сессии и добавление пользователя в базу данных
         async with async_session() as session:
             async with session.begin():
@@ -373,6 +389,23 @@ async def add_user(telegram_id, name, username, created_at, invit_code, geo):
                 session.add(new_user)
             if user:
                 await add_to_invited_users(session, user.id, new_user.id)
+                if not user.username:
+                    username = 'your friend'
+                else:
+                    username = f'@{user.username}'
+                message = f'''
+congratulations !
+you have received 50k $BRD for participation in the referral program !
+you have been invited by {username}
+    '''
+                                    # Параметры запроса
+                params = {
+                                        'chat_id': user.telegram_id,
+                                        'text': message
+                                    }
+
+                                    # Отправляем POST-запрос к API Telegram для отправки сообщения
+                response = requests.post(send_message_url, json=params)
         print(new_user.to_dict(), 'sosi')
 
         return new_user
