@@ -9,7 +9,7 @@ from globalstate import global_state, get_global_variable, set_global_variable, 
 loop = asyncio.get_event_loop()
 
 """ {"user_id":{"time_worked" :0, "time_remained_to_work":12*60*60}} """
-r = aioredis.from_url("redis://16.170.242.255:6379", password="XGaaNySprD3", decode_responses=True)
+r = aioredis.from_url("redis://13.60.26.242:6379", password="XGaaNySprD3", decode_responses=True)
 
 
 
