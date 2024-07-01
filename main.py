@@ -168,7 +168,7 @@ async def get_refs_for_ussser(request: Request):
 async def tonconnect_manifest_json(request: Request):
     return {
     "url": "https://api.tappybrd.com",                        
-    "name": "tappybird",                     
+    "name": "tappycoin",                     
     "iconUrl": "https://telegra.ph/file/e652eb17c5f402a41e3b2.jpg"}
 
 @app.get('/usersleaderboard')
