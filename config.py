@@ -4,9 +4,9 @@ discord_client_id = 1250527248784687155
 discord_public_key = '0fe9a6df57680932784d1d0f809a6e347d445c4967f8c687620840e9decbf32c'
 discord_client_secret = 'B6Q80pkS8j1qV4U3EsUZg2jlEhxj526Q'
 
-bot_token = '6986907470:AAFGGwdxSoYAPbOA14qi5kPKwG4uFYltD4k'
+bot_token = '6323134966:AAG1pOAOvT0IdhKpxMneMmSa5CfvOmGSdRc'
 
-official_channel_link = 'https://t.me/tappycoinbot'
+official_channel_link = 'https://t.me/tappybird_bot'
 admin_credentials = {
     'login':'admin',
     'password':'admin'
