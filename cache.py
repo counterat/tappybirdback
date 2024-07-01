@@ -84,7 +84,7 @@ async def new_task(key,value):
     print(value_json, type(value_json))
     value_json.append(value)
 
-    await r.hset('tasks', key, json.dumps(value_json))
+    await r.hset('tasks', key, value['id'])
     
     
     return (value)
