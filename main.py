@@ -689,7 +689,12 @@ async def authorize_user(request: Request):
             **user.to_dict(),
             **res
         }
-        
+        time_for_expiring_autoclickers = await find_tap_bot_in_cache(int(user.id))
+        if time_for_expiring_autoclickers:
+            if not time_for_expiring_autoclickers['time_remained_to_work']:
+                time_for_expiring_autoclickers['time_remained_to_work'] = 12*60*60
+                time_for_expiring_autoclickers['time_worked'] = 0
+                await update_tap_bot(user.id, time_for_expiring_autoclickers)
         users_birds = [BIRDLIST[bird_id - 1] for bird_id in user.birds]
         response['birds'] = users_birds
         response['invite_link'] = official_channel_link + f'?start={user.invitation_code}'
