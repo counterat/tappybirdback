@@ -60,9 +60,12 @@ async def find_task_in_region_in_cache(geo):
     tasks_data = json.loads(tasks_data)
     tasks_to_send = []
     for task_id in tasks_data:
-        task_to_send = await find_task_in_cache(task_id)
-        if task_to_send:
-            tasks_to_send.append(task_to_send)
+        try:
+            task_to_send = await find_task_in_cache(task_id)
+            if task_to_send:
+                tasks_to_send.append(task_to_send)
+        except:
+            ''
     return tasks_to_send
 
 async def fetch_all_tasks():
@@ -72,6 +75,7 @@ async def fetch_all_tasks():
 async def delete_task(taskId):
     await r.hdel('all_tasks', taskId )
     fetched_tasks = await fetch_all_tasks()
+
     return fetched_tasks
 
 async def new_task(key,value):
