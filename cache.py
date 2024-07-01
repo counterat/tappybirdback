@@ -125,13 +125,15 @@ async def click_for_autoclicker_users():
             
             value_json = await r.hget('users', int(user_id))
             value_dict = json.loads(value_json)
+            print(value_dict)
             boosters_dict = value_dict.get('boosters')
             if boosters_dict['tap bot'] !={}:
                 time_for_expiring_autoclickers = await find_tap_bot_in_cache(int(user_id))
-                print(time_for_expiring_autoclickers)
+                print(time_for_expiring_autoclickers, 'time_for_expiring_autoclickers')
                 if time_for_expiring_autoclickers['time_remained_to_work'] <= 0:
                     pass
                 else:
+                   
                     connected_users = get_global_variable()
                     if int(user_id)not in connected_users:
                         await mine_brd(user_id, True)
@@ -303,7 +305,7 @@ async def mine_brd(user_id, is_autoclicker=False):
             print('hammer'*40, brds_for_tap, -1*brds_for_tap)
         # Обновляем баланс энергии и монет пользователя
         if is_autoclicker:
-            brds_for_tap = min(brds_for_tap, 3) if not hammer else brds_for_tap
+            brds_for_tap = min(brds_for_tap, 3) 
             result = await update_user_energy_and_coin_balance_transaction(user_id, -60 * brds_for_tap, 60 * brds_for_tap)
         else:
             if hammer:
