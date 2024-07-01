@@ -464,7 +464,7 @@ async def check_is_task_completed(request: Request):
                                 
                                     print("completed_subtasks.append(subtask['id'])")
                                     completed_subtasks.append(subtask['id'])
-                                    
+                                    result = await append_completed_tasks_to_user(user_id, subtask['id'])
                                 
                         elif subtask['action']['action_title'] == 'comment':
                             result = await handle_comment_on_socnet_task(user_id, subtask['id'])
@@ -473,6 +473,7 @@ async def check_is_task_completed(request: Request):
                             if result:
                                 print("completed_subtasks.append(subtask['id'])")
                                 completed_subtasks.append(subtask['id'])
+                                result = await append_completed_tasks_to_user(user_id, subtask['id'])
                     else:
                         completed_subtasks.append(subtask['id'])
             print(completed_subtasks, subtasks, 'mudak'*100)
