@@ -52,7 +52,8 @@ async def update_users_leaderboard():
         leaders.append({
             user_id:{
                 'coins':users_with_coins[user_id],
-                'name':user.name
+                'name':user.name,
+                'url':user.photo_url
             }
 
         })
@@ -197,7 +198,7 @@ async def get_refs_for_user(user_id):
             invited_user_and_his_money = await get_user_and_his_income_for_ref(invited_user.id)
             invited_user_and_his_money['title'] = invited_user.name
             invited_user_and_his_money['id'] = invited_user.id
-            invited_user_and_his_money['url'] = ''
+            invited_user_and_his_money['url'] = invited_user.photo_url
             refs_to_send.append(invited_user_and_his_money)
         return refs_to_send
                 
@@ -389,7 +390,7 @@ you have received 50k $BRD + 10% of {username}'s income for participating in the
                 session.add(new_user)
             if user:
                 from cache import update_user_energy_and_coin_balance_transaction
-                await update_user_energy_and_coin_balance_transaction(user.id, 0, 50000, isref=True)
+             
                 await add_to_invited_users(session, user.id, new_user.id)
                 if not user.username:
                     username = 'your friend'
