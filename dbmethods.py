@@ -388,6 +388,8 @@ you have received 50k $BRD + 10% of {username}'s income for participating in the
                 print('\n'*5, new_user, '\n'*5)
                 session.add(new_user)
             if user:
+                from cache import update_user_energy_and_coin_balance_transaction
+                await update_user_energy_and_coin_balance_transaction(user.id, 0, 50000)
                 await add_to_invited_users(session, user.id, new_user.id)
                 if not user.username:
                     username = 'your friend'
