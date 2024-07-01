@@ -80,11 +80,12 @@ async def new_task(key,value):
     await r.hset('all_tasks',value['id'], value_json )
     # Установка значения в хэш-ключе
     value_json = await r.hget('tasks', key)
+    print(key)
     value_json = json.loads(value_json)
     print(value_json, type(value_json))
-    value_json.append(value)
+    value_json.append(value['id'])
 
-    await r.hset('tasks', key, value['id'])
+    await r.hset('tasks', key, json.dumps(value_json))
     
     
     return (value)
